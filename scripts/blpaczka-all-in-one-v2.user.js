@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         BLPaczka - All In One v2.0 (Zoptymalizowany)
 // @namespace    http://tampermonkey.net/
-// @version      2.0.0
-// @description  Kompletny zestaw narzędzi: Szybkie wyszukiwanie, Licznik czasu, Kopiowanie danych, Narzędzia API, Ulepszona lista, Podgląd XLSX, Panel ustawień.
+// @version      2.1.0
+// @description  Kompletny zestaw narzędzi: Szybkie wyszukiwanie, Ochrona przed blokadą, Licznik czasu, Kopiowanie danych, Narzędzia API, Ulepszona lista, Podgląd XLSX, Panel ustawień.
 // @author       Gemini & User & Claude
 // @match        *://*.blpaczka.com/*
 // @match        https://api.blpaczka.com/*
@@ -1889,6 +1889,50 @@
         }
     };
 
+    // ================= MODUŁ: OCHRONA PRZED BLOKADĄ =================
+    const BlockProtection = {
+        // Lista niebezpiecznych ścieżek które obciążają bazę danych
+        dangerousPaths: [
+            '/admin/courier/stats',       // Statystyki
+            '/admin/courier/cart_orders', // Zamówienia
+            '/admin/courier/searches'     // Wyszukiwania
+        ],
+
+        init() {
+            // Nasłuchujemy każdego kliknięcia na stronie (useCapture = true)
+            document.addEventListener('click', (e) => this.handleClick(e), true);
+        },
+
+        handleClick(e) {
+            // Sprawdzamy, czy kliknięto w link (lub element wewnątrz linku)
+            const clickedLink = e.target.closest('a');
+            if (!clickedLink) return;
+
+            // Pobieramy adres docelowy
+            const linkHref = clickedLink.getAttribute('href');
+            if (!linkHref) return;
+
+            // Sprawdzamy, czy adres zawiera niebezpieczną ścieżkę
+            const isDangerous = this.dangerousPaths.some(path => linkHref.includes(path));
+            
+            if (isDangerous) {
+                const confirmed = confirm(
+                    "⚠️ OSTRZEŻENIE ⚠️\n\n" +
+                    "Zamierzasz wejść w zakładkę, która generuje duże obciążenie bazy danych.\n\n" +
+                    "Ta operacja może zablokować system na kilka minut!\n\n" +
+                    "Czy na pewno chcesz kontynuować?"
+                );
+
+                if (!confirmed) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🛡️ BLPaczka: Zablokowano wejście w:', linkHref);
+                    UI.showToast('Anulowano wejście w obciążającą zakładkę', 'warning');
+                }
+            }
+        }
+    };
+
     // ================= ROUTER - GŁÓWNA LOGIKA =================
     function initRouter() {
         const path = window.location.pathname;
@@ -1896,6 +1940,7 @@
         // Zawsze inicjalizuj podstawowe moduły
         SearchPanel.init();
         LoadTimer.init();
+        BlockProtection.init();  // Ochrona przed blokadą - zawsze aktywna
 
         // Widok szczegółów zlecenia
         if (path.includes('/admin/courier/orders/view/')) {
