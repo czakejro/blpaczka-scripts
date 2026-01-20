@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLPaczka - Skrypty Tampermonkey</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        .requirements {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 40px;
+        }
+
+        .requirements h3 {
+            color: #ffc107;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .requirements p {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .requirements a {
+            color: #4fc3f7;
+            text-decoration: none;
+        }
+
+        .requirements a:hover {
+            text-decoration: underline;
+        }
+
+        .scripts-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .script-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .script-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .script-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .script-info h2 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .script-version {
+            display: inline-block;
+            background: rgba(76, 175, 80, 0.2);
+            color: #81c784;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .script-description {
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .script-features {
+            margin-bottom: 20px;
+        }
+
+        .script-features h4 {
+            color: #888;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .features-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .feature-tag {
+            background: rgba(33, 150, 243, 0.15);
+            color: #64b5f6;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .install-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .install-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .install-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .instructions {
+            margin-top: 50px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 30px;
+        }
+
+        .instructions h3 {
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .steps {
+            counter-reset: step;
+        }
+
+        .step {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            counter-increment: step;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-number::before {
+            content: counter(step);
+        }
+
+        .step-content h4 {
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .step-content p {
+            color: #888;
+            line-height: 1.5;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #666;
+        }
+
+        /* Responsywność */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .script-header {
+                flex-direction: column;
+            }
+
+            .install-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 BLPaczka Skrypty</h1>
+            <p>Narzędzia usprawniające pracę w panelu administracyjnym</p>
+        </header>
+
+        <div class="requirements">
+            <h3>⚠️ Wymagania</h3>
+            <p>
+                Przed instalacją skryptów upewnij się, że masz zainstalowane rozszerzenie 
+                <a href="https://www.tampermonkey.net/" target="_blank">Tampermonkey</a> 
+                w swojej przeglądarce (Chrome, Firefox, Edge, Safari).
+            </p>
+        </div>
+
+        <div class="scripts-grid">
+            <!-- Skrypt 1: All-In-One -->
+            <div class="script-card">
+                <div class="script-header">
+                    <div class="script-info">
+                        <h2>🛠️ BLPaczka All-In-One</h2>
+                        <span class="script-version">v2.0.0</span>
+                    </div>
+                                        <a href="scripts/blpaczka-all-in-one-v2.user.js" class="install-btn" onclick="event.preventDefault(); window.location.href='scripts/blpaczka-all-in-one-v2.user.js';">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Zainstaluj
+                    </a>
+                    <p style="margin-top: 15px; font-size: 13px; color: #888;">
+                        💡 <strong>Nie działa?</strong> Kliknij prawym przyciskiem → "Kopiuj adres linku" → Wklej w nowej karcie
+                        <br>lub skopiuj ten link: <code style="background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 4px; user-select: all;">scripts/blpaczka-all-in-one-v2.user.js</code>
+                    </p>
+                </div>
+                <p class="script-description">
+                    Kompletny zestaw narzędzi do panelu BLPaczka. Zawiera szybkie wyszukiwanie przesyłek i klientów, 
+                    podgląd zestawień XLSX, kopiowanie danych, narzędzia API i wiele więcej.
+                </p>
+                <div class="script-features">
+                    <h4>Funkcje</h4>
+                    <div class="features-list">
+                        <span class="feature-tag">🔍 Szybkie wyszukiwanie</span>
+                        <span class="feature-tag">📦 Wyszukiwarka przesyłek</span>
+                        <span class="feature-tag">👤 Wyszukiwarka klientów</span>
+                        <span class="feature-tag">📊 Podgląd XLSX</span>
+                        <span class="feature-tag">📋 Kopiowanie danych</span>
+                        <span class="feature-tag">🛠️ Narzędzia API</span>
+                        <span class="feature-tag">⏱️ Licznik czasu</span>
+                        <span class="feature-tag">⚙️ Panel ustawień</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skrypt 2: Przykład dodatkowego skryptu -->
+            <!--
+            <div class="script-card">
+                <div class="script-header">
+                    <div class="script-info">
+                        <h2>📈 Inny Skrypt</h2>
+                        <span class="script-version">v1.0.0</span>
+                    </div>
+                    <a href="./scripts/inny-skrypt.user.js" class="install-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Zainstaluj
+                    </a>
+                </div>
+                <p class="script-description">
+                    Opis skryptu...
+                </p>
+            </div>
+            -->
+        </div>
+
+        <div class="instructions">
+            <h3>📖 Jak zainstalować?</h3>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number"></div>
+                    <div class="step-content">
+                        <h4>Kliknij przycisk "Zainstaluj"</h4>
+                        <p>Przy wybranym skrypcie kliknij zielony przycisk instalacji.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number"></div>
+                    <div class="step-content">
+                        <h4>Potwierdź instalację</h4>
+                        <p>Tampermonkey otworzy nową kartę z podglądem skryptu. Kliknij "Zainstaluj" lub "Install".</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number"></div>
+                    <div class="step-content">
+                        <h4>Gotowe!</h4>
+                        <p>Odśwież stronę BLPaczka - skrypt zacznie działać automatycznie.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions" style="margin-top: 20px;">
+            <h3>🔄 Jak zaktualizować?</h3>
+            <p style="color: #aaa; line-height: 1.6;">
+                Wystarczy ponownie kliknąć "Zainstaluj" - Tampermonkey wykryje że skrypt już istnieje 
+                i zaproponuje aktualizację. Możesz też włączyć automatyczne aktualizacje w ustawieniach Tampermonkey.
+            </p>
+        </div>
+
+        <footer>
+            <p>BLPaczka Scripts • Ostatnia aktualizacja: Styczeń 2026</p>
+        </footer>
+
+        <script>
+            // Pokaż pełny URL do skryptu
+            document.querySelectorAll('code').forEach(code => {
+                if (code.textContent.includes('.user.js')) {
+                    code.textContent = window.location.origin + '/scripts/blpaczka-all-in-one-v2.user.js';
+                    code.style.cursor = 'pointer';
+                    code.title = 'Kliknij aby skopiować';
+                    code.onclick = function() {
+                        navigator.clipboard.writeText(this.textContent);
+                        this.style.background = 'rgba(76, 175, 80, 0.3)';
+                        setTimeout(() => this.style.background = 'rgba(255,255,255,0.1)', 1000);
+                    };
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
