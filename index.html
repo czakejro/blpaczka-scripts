@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
@@ -73,6 +73,21 @@
             text-decoration: underline;
         }
 
+        .section-title {
+            font-size: 1.5rem;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .section-title span {
+            opacity: 0.6;
+            font-size: 0.9rem;
+            font-weight: normal;
+            margin-left: 10px;
+        }
+
         .scripts-grid {
             display: grid;
             gap: 20px;
@@ -92,6 +107,11 @@
             transform: translateY(-2px);
         }
 
+        .script-card.featured {
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
         .script-header {
             display: flex;
             justify-content: space-between;
@@ -102,7 +122,7 @@
         }
 
         .script-info h2 {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             margin-bottom: 5px;
             color: #fff;
         }
@@ -149,6 +169,13 @@
             font-size: 0.85rem;
         }
 
+        /* Kolory tagów dla różnych kurierów */
+        .feature-tag.inpost { background: rgba(255, 204, 0, 0.2); color: #ffcc00; }
+        .feature-tag.dpd { background: rgba(220, 53, 69, 0.2); color: #ff6b7a; }
+        .feature-tag.ups { background: rgba(54, 21, 5, 0.3); color: #ffb500; }
+        .feature-tag.fedex { background: rgba(75, 0, 130, 0.2); color: #9370db; }
+        .feature-tag.gls { background: rgba(0, 71, 187, 0.2); color: #64b5f6; }
+
         .install-btn {
             display: inline-flex;
             align-items: center;
@@ -156,9 +183,9 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
             border: none;
-            padding: 14px 28px;
+            padding: 12px 24px;
             border-radius: 10px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
@@ -171,9 +198,16 @@
         }
 
         .install-btn svg {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
         }
+
+        /* Kolory przycisków dla kurierów */
+        .install-btn.inpost { background: linear-gradient(135deg, #ffcc00 0%, #e6b800 100%); color: #000; }
+        .install-btn.dpd { background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%); }
+        .install-btn.ups { background: linear-gradient(135deg, #361505 0%, #5a2a0a 100%); border: 1px solid #ffb500; }
+        .install-btn.fedex { background: linear-gradient(135deg, #4b0082 0%, #6a0dad 100%); }
+        .install-btn.gls { background: linear-gradient(135deg, #0047bb 0%, #0056d6 100%); border: 1px solid #ffb500; }
 
         .instructions {
             margin-top: 50px;
@@ -233,6 +267,20 @@
             color: #666;
         }
 
+        .install-hint {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .install-hint code {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
         /* Responsywność */
         @media (max-width: 600px) {
             header h1 {
@@ -246,6 +294,10 @@
             .install-btn {
                 width: 100%;
                 justify-content: center;
+            }
+
+            .script-info h2 {
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -266,15 +318,16 @@
             </p>
         </div>
 
+        <!-- GŁÓWNY SKRYPT -->
+        <h2 class="section-title">⭐ Główny skrypt <span>(zalecany)</span></h2>
         <div class="scripts-grid">
-            <!-- Skrypt 1: All-In-One -->
-            <div class="script-card">
+            <div class="script-card featured">
                 <div class="script-header">
                     <div class="script-info">
                         <h2>🛠️ BLPaczka All-In-One</h2>
                         <span class="script-version">v2.4.2</span>
                     </div>
-                                        <a href="scripts/blpaczka-all-in-one-v2.user.js" class="install-btn" onclick="event.preventDefault(); window.location.href='scripts/blpaczka-all-in-one-v2.user.js';">
+                    <a href="scripts/blpaczka-all-in-one-v2.user.js" class="install-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
@@ -282,13 +335,9 @@
                         </svg>
                         Zainstaluj
                     </a>
-                    <p style="margin-top: 15px; font-size: 13px; color: #888;">
-                        💡 <strong>Nie działa?</strong> Kliknij prawym przyciskiem → "Kopiuj adres linku" → Wklej w nowej karcie
-                        <br>lub skopiuj ten link: <code style="background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 4px; user-select: all;">scripts/blpaczka-all-in-one-v2.user.js</code>
-                    </p>
                 </div>
                 <p class="script-description">
-                    Kompletny zestaw narzędzi do panelu BLPaczka. Zawiera szybkie wyszukiwanie przesyłek i klientów, 
+                    Kompletny zestaw narzędzi do panelu BLPaczka. Zawiera tryb ciemny, szybkie wyszukiwanie przesyłek i klientów, 
                     ochronę przed przypadkowym wejściem w obciążające zakładki, podgląd zestawień XLSX, kopiowanie danych, narzędzia API i wiele więcej.
                 </p>
                 <div class="script-features">
@@ -307,16 +356,20 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Skrypt 2: Przykład dodatkowego skryptu -->
-            <!--
+        <!-- SKRYPTY AUTO PICKUP -->
+        <h2 class="section-title">🚚 Auto Pickup <span>(zamawianie kuriera)</span></h2>
+        <div class="scripts-grid">
+            
+            <!-- InPost Auto Pickup -->
             <div class="script-card">
                 <div class="script-header">
                     <div class="script-info">
-                        <h2>📈 Inny Skrypt</h2>
-                        <span class="script-version">v1.0.0</span>
+                        <h2>📦 InPost Auto Pickup</h2>
+                        <span class="script-version">v2.9</span>
                     </div>
-                    <a href="./scripts/inny-skrypt.user.js" class="install-btn">
+                    <a href="scripts/blpaczka-inpost-auto-pickup.user.js" class="install-btn inpost">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
@@ -326,10 +379,184 @@
                     </a>
                 </div>
                 <p class="script-description">
-                    Opis skryptu...
+                    Automatyzuje zamawianie kuriera InPost. Obsługuje wybór między adresem standardowym a niestandardowym. 
+                    E-mail zawsze pobierany z głównego Nadawcy.
                 </p>
+                <div class="features-list">
+                    <span class="feature-tag inpost">InPost</span>
+                    <span class="feature-tag">Auto-wypełnianie</span>
+                    <span class="feature-tag">Wybór adresu</span>
+                </div>
             </div>
-            -->
+
+            <!-- DPD Auto Pickup -->
+            <div class="script-card">
+                <div class="script-header">
+                    <div class="script-info">
+                        <h2>🔴 DPD Auto Pickup</h2>
+                        <span class="script-version">v1.7</span>
+                    </div>
+                    <a href="scripts/blpaczka-dpd-auto-pickup.user.js" class="install-btn dpd">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Zainstaluj
+                    </a>
+                </div>
+                <p class="script-description">
+                    Automatyzuje zamawianie kuriera DPD. Wykrywa przesyłki DPD i automatycznie wypełnia formularz zamówienia kuriera.
+                    Zawiera fix dla numeru telefonu.
+                </p>
+                <div class="features-list">
+                    <span class="feature-tag dpd">DPD</span>
+                    <span class="feature-tag">Auto-wypełnianie</span>
+                    <span class="feature-tag">Fix telefonu</span>
+                </div>
+            </div>
+
+            <!-- UPS Auto Pickup -->
+            <div class="script-card">
+                <div class="script-header">
+                    <div class="script-info">
+                        <h2>🟤 UPS Auto Pickup</h2>
+                        <span class="script-version">v1.2</span>
+                    </div>
+                    <a href="scripts/blpaczka-ups-auto-pickup.user.js" class="install-btn ups">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Zainstaluj
+                    </a>
+                </div>
+                <p class="script-description">
+                    Automatyzuje zamawianie kuriera UPS. Wykrywa UPS po numerze listu (1Z...) lub nazwie konta/cennika. 
+                    Automatycznie usuwa polskie znaki i wypełnia formularz.
+                </p>
+                <div class="features-list">
+                    <span class="feature-tag ups">UPS</span>
+                    <span class="feature-tag">Auto-wypełnianie</span>
+                    <span class="feature-tag">Usuwanie PL znaków</span>
+                </div>
+            </div>
+
+            <!-- FedEx Auto Pickup -->
+            <div class="script-card">
+                <div class="script-header">
+                    <div class="script-info">
+                        <h2>🟣 FedEx Auto Pickup</h2>
+                        <span class="script-version">v1.4</span>
+                    </div>
+                    <a href="scripts/blpaczka-fedex-auto-pickup.user.js" class="install-btn fedex">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Zainstaluj
+                    </a>
+                </div>
+                <p class="script-description">
+                    Automatyzuje zamawianie kuriera FedEx. Obsługuje niestandardowy adres odbioru. 
+                    Zachowuje polskie znaki w formularzu.
+                </p>
+                <div class="features-list">
+                    <span class="feature-tag fedex">FedEx</span>
+                    <span class="feature-tag">Auto-wypełnianie</span>
+                    <span class="feature-tag">Niestandardowy adres</span>
+                </div>
+            </div>
+
+            <!-- GLS Auto Email -->
+            <div class="script-card">
+                <div class="script-header">
+                    <div class="script-info">
+                        <h2>🔵 GLS Auto Email (Freshdesk)</h2>
+                        <span class="script-version">v1.2</span>
+                    </div>
+                    <a href="scripts/blpaczka-gls-auto-email.user.js" class="install-btn gls">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Zainstaluj
+                    </a>
+                </div>
+                <p class="script-description">
+                    Szybkie zamawianie kuriera GLS przez Freshdesk. Automatycznie tworzy wiadomość email 
+                    i uzupełnia pola (Grupa, Typ, Przewoźnik).
+                </p>
+                <div class="features-list">
+                    <span class="feature-tag gls">GLS</span>
+                    <span class="feature-tag">Freshdesk</span>
+                    <span class="feature-tag">Auto email</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- INNE SKRYPTY -->
+        <h2 class="section-title">🔧 Narzędzia dodatkowe</h2>
+        <div class="scripts-grid">
+
+            <!-- InPost Reklamacje -->
+            <div class="script-card">
+                <div class="script-header">
+                    <div class="script-info">
+                        <h2>⚠️ InPost Auto Reklamacje</h2>
+                        <span class="script-version">v2.7</span>
+                    </div>
+                    <a href="scripts/blpaczka-inpost-reklamacje.user.js" class="install-btn inpost">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Zainstaluj
+                    </a>
+                </div>
+                <p class="script-description">
+                    Automatycznie wypełnia formularz reklamacyjny InPost na podstawie danych z przesyłki. 
+                    Ignoruje przesyłki FedEx (fix konfliktu).
+                </p>
+                <div class="features-list">
+                    <span class="feature-tag inpost">InPost</span>
+                    <span class="feature-tag">Reklamacje</span>
+                    <span class="feature-tag">Auto-wypełnianie</span>
+                </div>
+            </div>
+
+            <!-- Smart Copy -->
+            <div class="script-card">
+                <div class="script-header">
+                    <div class="script-info">
+                        <h2>📑 Smart Copy (Split)</h2>
+                        <span class="script-version">v1.4</span>
+                    </div>
+                    <a href="scripts/blpaczka-smart-copy.user.js" class="install-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Zainstaluj
+                    </a>
+                </div>
+                <p class="script-description">
+                    Dodaje ikonki kopiowania do KAŻDEJ linii adresu oddzielnie (Miasto, Kod, Ulica). 
+                    Wersja "Split" dla precyzyjnego kopiowania danych.
+                </p>
+                <div class="features-list">
+                    <span class="feature-tag">📋 Kopiowanie</span>
+                    <span class="feature-tag">Linie adresu</span>
+                    <span class="feature-tag">Split</span>
+                </div>
+            </div>
+
         </div>
 
         <div class="instructions">
@@ -339,7 +566,7 @@
                     <div class="step-number"></div>
                     <div class="step-content">
                         <h4>Kliknij przycisk "Zainstaluj"</h4>
-                        <p>Przy wybranym skrypcie kliknij zielony przycisk instalacji.</p>
+                        <p>Przy wybranym skrypcie kliknij kolorowy przycisk instalacji.</p>
                     </div>
                 </div>
                 <div class="step">
@@ -367,25 +594,17 @@
             </p>
         </div>
 
+        <div class="instructions" style="margin-top: 20px;">
+            <h3>❓ Problemy z instalacją?</h3>
+            <p style="color: #aaa; line-height: 1.6;">
+                Jeśli przycisk nie działa, kliknij na niego prawym przyciskiem myszy → "Kopiuj adres linku" 
+                → Wklej w nowej karcie przeglądarki. Tampermonkey powinien automatycznie rozpoznać skrypt.
+            </p>
+        </div>
+
         <footer>
             <p>BLPaczka Scripts • Ostatnia aktualizacja: Styczeń 2026</p>
         </footer>
-
-        <script>
-            // Pokaż pełny URL do skryptu
-            document.querySelectorAll('code').forEach(code => {
-                if (code.textContent.includes('.user.js')) {
-                    code.textContent = window.location.origin + '/scripts/blpaczka-all-in-one-v2.user.js';
-                    code.style.cursor = 'pointer';
-                    code.title = 'Kliknij aby skopiować';
-                    code.onclick = function() {
-                        navigator.clipboard.writeText(this.textContent);
-                        this.style.background = 'rgba(76, 175, 80, 0.3)';
-                        setTimeout(() => this.style.background = 'rgba(255,255,255,0.1)', 1000);
-                    };
-                }
-            });
-        </script>
     </div>
 </body>
 </html>
