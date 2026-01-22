@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         BLPaczka - All In One v2.0 (Zoptymalizowany)
 // @namespace    http://tampermonkey.net/
-// @version      2.1.0
-// @description  Kompletny zestaw narzędzi: Szybkie wyszukiwanie, Ochrona przed blokadą, Licznik czasu, Kopiowanie danych, Narzędzia API, Ulepszona lista, Podgląd XLSX, Panel ustawień.
+// @version      2.4.2
+// @description  Kompletny zestaw narzędzi: Tryb ciemny, Szybkie wyszukiwanie, Ochrona przed blokadą, Licznik czasu, Kopiowanie danych, Narzędzia API, Ulepszona lista, Podgląd XLSX, Panel ustawień.
 // @author       Gemini & User & Claude
 // @match        *://*.blpaczka.com/*
 // @match        https://api.blpaczka.com/*
@@ -25,6 +25,7 @@
     const CONFIG = {
         // Domyślne ustawienia (można zmienić w panelu)
         defaults: {
+            darkMode: false,
             clearDateFrom: true,
             showLoadTimer: true,
             itemsPerPage: 20,
@@ -45,7 +46,7 @@
         },
 
         // Wersja dla cache-busting
-        version: '2.0.0'
+        version: '2.4.2'
     };
 
     // ================= STORAGE HELPER =================
@@ -731,6 +732,10 @@
             transition: all 0.2s ease;
             padding: 4px;
             border-radius: 4px;
+            user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            -moz-user-select: none;
         }
 
         .blp-copy-icon:hover {
@@ -891,6 +896,547 @@
             .blp-search-hint {
                 padding-left: 0;
             }
+        }
+
+        /* ================= DARK MODE ================= */
+        html.blp-dark-mode,
+        body.blp-dark-mode {
+            background: #1e1e1e !important;
+            background-color: #1e1e1e !important;
+            background-image: none !important;
+            color: #d4d4d4 !important;
+        }
+
+        /* Nadpisanie wszelkich obrazków/gradientów w tle */
+        .blp-dark-mode::before,
+        .blp-dark-mode::after,
+        .blp-dark-mode body::before,
+        .blp-dark-mode body::after {
+            display: none !important;
+            background: none !important;
+        }
+
+        /* Upewnij się że całe tło jest ciemne */
+        .blp-dark-mode * {
+            border-color: #404040;
+        }
+
+        /* Header */
+        .blp-dark-mode #header {
+            background: #1e1e1e !important;
+            background-color: #1e1e1e !important;
+            background-image: none !important;
+            border-bottom: 1px solid #404040 !important;
+        }
+
+        .blp-dark-mode #header *,
+        .blp-dark-mode #header::before,
+        .blp-dark-mode #header::after {
+            background-image: none !important;
+        }
+
+        .blp-dark-mode #header_left {
+            background: transparent !important;
+            background-image: none !important;
+        }
+
+        .blp-dark-mode #header_right,
+        .blp-dark-mode #header_right a {
+            color: #b0b0b0 !important;
+        }
+
+        .blp-dark-mode #header_right a:hover {
+            color: #fff !important;
+        }
+
+        .blp-dark-mode #header_left img {
+            background: transparent !important;
+        }
+
+        /* Menu boczne */
+        .blp-dark-mode .content_menu,
+        .blp-dark-mode #cssmenu,
+        .blp-dark-mode #cssmenu > ul,
+        .blp-dark-mode #cssmenu > ul > li {
+            background-color: #252525 !important;
+            background: #252525 !important;
+        }
+
+        .blp-dark-mode #cssmenu ul li a,
+        .blp-dark-mode #cssmenu > ul > li > a,
+        .blp-dark-mode #cssmenu > ul > li > a span {
+            color: #c0c0c0 !important;
+            background-color: transparent !important;
+            background: transparent !important;
+        }
+
+        .blp-dark-mode #cssmenu ul li a:hover,
+        .blp-dark-mode #cssmenu ul li a.selected,
+        .blp-dark-mode #cssmenu > ul > li:hover > a,
+        .blp-dark-mode #cssmenu > ul > li.active > a {
+            background-color: #333 !important;
+            background: #333 !important;
+            color: #fff !important;
+        }
+
+        .blp-dark-mode #cssmenu ul li a:hover span,
+        .blp-dark-mode #cssmenu ul li a.selected span {
+            color: #fff !important;
+        }
+
+        .blp-dark-mode #cssmenu ul ul,
+        .blp-dark-mode #cssmenu > ul > li > ul {
+            background-color: #2a2a2a !important;
+            background: #2a2a2a !important;
+            border: 1px solid #404040 !important;
+        }
+
+        .blp-dark-mode #cssmenu ul ul li,
+        .blp-dark-mode #cssmenu ul ul li a {
+            background-color: #2a2a2a !important;
+            background: #2a2a2a !important;
+            border-bottom: 1px solid #353535 !important;
+        }
+
+        .blp-dark-mode #cssmenu ul ul li a:hover {
+            background-color: #383838 !important;
+            background: #383838 !important;
+        }
+
+        /* Content box */
+        .blp-dark-mode #content,
+        .blp-dark-mode #content_960,
+        .blp-dark-mode #content_box {
+            background-color: #1e1e1e !important;
+        }
+
+        /* Tabs */
+        .blp-dark-mode .tabs,
+        .blp-dark-mode #box_options_nav_title_2 {
+            background-color: #2d2d2d !important;
+        }
+
+        .blp-dark-mode .tabs a,
+        .blp-dark-mode #box_options_nav_title_2 a {
+            color: #b0b0b0 !important;
+        }
+
+        .blp-dark-mode .tabs .selected,
+        .blp-dark-mode #box_options_nav_title_2.selected {
+            background-color: #404040 !important;
+        }
+
+        .blp-dark-mode .tabs .selected a {
+            color: #fff !important;
+        }
+
+        /* Tabele */
+        .blp-dark-mode table,
+        .blp-dark-mode table.view {
+            background-color: #252525 !important;
+            border-color: #404040 !important;
+        }
+
+        .blp-dark-mode table tr,
+        .blp-dark-mode table.view tr {
+            background-color: #252525 !important;
+            border-bottom: 1px solid #353535 !important;
+        }
+
+        .blp-dark-mode table tr:nth-child(even),
+        .blp-dark-mode table.view tr:nth-child(even) {
+            background-color: #2a2a2a !important;
+        }
+
+        .blp-dark-mode table tr:hover {
+            background-color: #333 !important;
+        }
+
+        .blp-dark-mode table th {
+            background-color: #333 !important;
+            color: #e0e0e0 !important;
+            border-bottom: 2px solid #505050 !important;
+        }
+
+        .blp-dark-mode table td {
+            color: #d0d0d0 !important;
+            border-color: #353535 !important;
+        }
+
+        .blp-dark-mode table td:first-child {
+            background-color: #2d2d2d !important;
+            color: #a0a0a0 !important;
+        }
+
+        /* Linki */
+        .blp-dark-mode a {
+            color: #6db3f2 !important;
+        }
+
+        .blp-dark-mode a:hover {
+            color: #9dcfff !important;
+        }
+
+        /* Formularze */
+        .blp-dark-mode #box_options,
+        .blp-dark-mode #box_options_filtr_Article,
+        .blp-dark-mode #box_options_right,
+        .blp-dark-mode #box_options_left,
+        .blp-dark-mode #box_options_bottom {
+            background-color: #2a2a2a !important;
+            border-color: #404040 !important;
+        }
+
+        .blp-dark-mode input[type="text"],
+        .blp-dark-mode input[type="password"],
+        .blp-dark-mode input[type="email"],
+        .blp-dark-mode input[type="number"],
+        .blp-dark-mode textarea,
+        .blp-dark-mode select {
+            background-color: #333 !important;
+            border: 1px solid #505050 !important;
+            color: #e0e0e0 !important;
+        }
+
+        .blp-dark-mode input[type="text"]:focus,
+        .blp-dark-mode select:focus,
+        .blp-dark-mode textarea:focus {
+            border-color: #6db3f2 !important;
+            outline: none !important;
+        }
+
+        .blp-dark-mode label {
+            color: #b0b0b0 !important;
+        }
+
+        /* Przyciski */
+        .blp-dark-mode input[type="submit"],
+        .blp-dark-mode button {
+            background-color: #404040 !important;
+            color: #e0e0e0 !important;
+            border: 1px solid #505050 !important;
+        }
+
+        .blp-dark-mode input[type="submit"]:hover,
+        .blp-dark-mode button:hover {
+            background-color: #505050 !important;
+        }
+
+        /* Nagłówki sekcji */
+        .blp-dark-mode h2,
+        .blp-dark-mode h3 {
+            color: #e0e0e0 !important;
+        }
+
+        .blp-dark-mode #box_options_nav_title {
+            background-color: #333 !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* Notices i alerty */
+        .blp-dark-mode .notice,
+        .blp-dark-mode span.notice {
+            background-color: #3d3520 !important;
+            border-color: #5a4a20 !important;
+            color: #e0c060 !important;
+        }
+
+        /* Gray spans */
+        .blp-dark-mode .gray,
+        .blp-dark-mode .grey,
+        .blp-dark-mode span.gray,
+        .blp-dark-mode span.grey {
+            color: #808080 !important;
+        }
+
+        /* Green/Red status */
+        .blp-dark-mode .green,
+        .blp-dark-mode span.green {
+            color: #5cb85c !important;
+        }
+
+        .blp-dark-mode .red,
+        .blp-dark-mode span.red {
+            color: #d9534f !important;
+        }
+
+        /* Paginator */
+        .blp-dark-mode .paginator_box {
+            background-color: #2a2a2a !important;
+        }
+
+        .blp-dark-mode .paginator_box a {
+            color: #6db3f2 !important;
+        }
+
+        .blp-dark-mode .paginator_box .current {
+            background-color: #404040 !important;
+            color: #fff !important;
+        }
+
+        /* Footer */
+        .blp-dark-mode #footer {
+            background-color: #1a1a1a !important;
+            border-top: 1px solid #333 !important;
+            color: #707070 !important;
+        }
+
+        .blp-dark-mode #footer_content3 {
+            background-color: #1a1a1a !important;
+        }
+
+        /* Site index table */
+        .blp-dark-mode #site_index_table {
+            background-color: #252525 !important;
+            border-color: #404040 !important;
+        }
+
+        /* Records count */
+        .blp-dark-mode .recordsCount {
+            color: #a0a0a0 !important;
+        }
+
+        /* Kolorowe przyciski akcji - zachowaj kolory ale przyciemnij */
+        .blp-dark-mode a[style*="background"],
+        .blp-dark-mode .btn,
+        .blp-dark-mode .button {
+            filter: brightness(0.85) !important;
+        }
+
+        /* Ikonki akcji - inwertuj lub przyciemnij */
+        .blp-dark-mode .contentEdit,
+        .blp-dark-mode .contentDelete,
+        .blp-dark-mode .contentPreview,
+        .blp-dark-mode .contentDownload,
+        .blp-dark-mode .contentMoney,
+        .blp-dark-mode .contentAttach,
+        .blp-dark-mode .contentPublish,
+        .blp-dark-mode .contentCancel,
+        .blp-dark-mode .contentNumber,
+        .blp-dark-mode .contentCost,
+        .blp-dark-mode .contentOrders,
+        .blp-dark-mode .contentPackages,
+        .blp-dark-mode .contentList {
+            filter: brightness(1.1) saturate(0.9) !important;
+        }
+
+        /* Zakładka Paczki (aktywna) */
+        .blp-dark-mode .tabs div[id*="nav_title"],
+        .blp-dark-mode div[id*="box_options_nav_title"] {
+            background-color: #2d2d2d !important;
+        }
+
+        /* Górny pasek z przyciskami (Wczytaj wszystko, Wszystkie, etc) */
+        .blp-dark-mode div[style*="background"] {
+            background-color: #2a2a2a !important;
+        }
+
+        /* Separator "Klient" */
+        .blp-dark-mode fieldset,
+        .blp-dark-mode legend {
+            border-color: #404040 !important;
+            color: #a0a0a0 !important;
+        }
+
+        /* Tekst w tabelach - upewnij się że jest widoczny */
+        .blp-dark-mode #site_index_table td,
+        .blp-dark-mode #site_index_table td a,
+        .blp-dark-mode #site_index_table td span {
+            color: #d0d0d0 !important;
+        }
+
+        .blp-dark-mode #site_index_table td a {
+            color: #6db3f2 !important;
+        }
+
+        .blp-dark-mode #site_index_table td a:hover {
+            color: #9dcfff !important;
+        }
+
+        /* Rating / Cena przesyłki - tabela z cenami */
+        .blp-dark-mode .rating,
+        .blp-dark-mode .rating table,
+        .blp-dark-mode .rating table tr,
+        .blp-dark-mode .rating table td,
+        .blp-dark-mode .rating table th {
+            background-color: #2a2a2a !important;
+            background: #2a2a2a !important;
+            color: #d0d0d0 !important;
+        }
+
+        .blp-dark-mode .rating table td:first-child,
+        .blp-dark-mode .rating .rating_title {
+            background-color: #252525 !important;
+            background: #252525 !important;
+        }
+
+        .blp-dark-mode .rating .rating_price,
+        .blp-dark-mode .rating table td:last-child {
+            background-color: #2d2d2d !important;
+            background: #2d2d2d !important;
+        }
+
+        /* Tabele wewnątrz view */
+        .blp-dark-mode table.view table,
+        .blp-dark-mode table.view table tr,
+        .blp-dark-mode table.view table td,
+        .blp-dark-mode table.view table th {
+            background-color: #2a2a2a !important;
+            background: #2a2a2a !important;
+            color: #d0d0d0 !important;
+            border-color: #404040 !important;
+        }
+
+        /* Wszystkie tabele wewnętrzne */
+        .blp-dark-mode td table,
+        .blp-dark-mode td table tr,
+        .blp-dark-mode td table td {
+            background-color: #2a2a2a !important;
+            background: #2a2a2a !important;
+        }
+
+        /* Big/strong w cenach */
+        .blp-dark-mode big,
+        .blp-dark-mode big strong,
+        .blp-dark-mode .rating big,
+        .blp-dark-mode .rating strong {
+            color: #e0e0e0 !important;
+        }
+
+        /* H2, H3 w sekcjach */
+        .blp-dark-mode td h2,
+        .blp-dark-mode td h3,
+        .blp-dark-mode .rating h2,
+        .blp-dark-mode .rating h3 {
+            color: #e0e0e0 !important;
+        }
+
+        /* Logo w headerze - rozjaśnij jeśli ciemne */
+        .blp-dark-mode #header_left img {
+            filter: brightness(1.2) !important;
+            background: transparent !important;
+        }
+
+        /* Scrollbary */
+        .blp-dark-mode ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        .blp-dark-mode ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        .blp-dark-mode ::-webkit-scrollbar-thumb {
+            background: #404040;
+            border-radius: 5px;
+        }
+
+        .blp-dark-mode ::-webkit-scrollbar-thumb:hover {
+            background: #505050;
+        }
+
+        /* Box nav */
+        .blp-dark-mode #box_options_nav {
+            background-color: #2a2a2a !important;
+        }
+
+        .blp-dark-mode #box_options_nav_add a {
+            background-color: #2e7d32 !important;
+            color: #fff !important;
+        }
+
+        /* Rating section */
+        .blp-dark-mode .rating {
+            color: #a0a0a0 !important;
+        }
+
+        .blp-dark-mode .rating table td {
+            background-color: #2a2a2a !important;
+        }
+
+        /* Content icons */
+        .blp-dark-mode a.contentEdit,
+        .blp-dark-mode a.contentDelete,
+        .blp-dark-mode a.contentPreview,
+        .blp-dark-mode a.contentDownload,
+        .blp-dark-mode a.contentMoney,
+        .blp-dark-mode a.contentAttach {
+            filter: brightness(0.9) !important;
+        }
+
+        /* BLP elements w dark mode */
+        .blp-dark-mode #blp-search-panel {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%) !important;
+            border-color: #404040 !important;
+        }
+
+        .blp-dark-mode .blp-search-header {
+            border-bottom-color: #404040 !important;
+        }
+
+        .blp-dark-mode .blp-search-header span,
+        .blp-dark-mode .blp-search-label {
+            color: #b0b0b0 !important;
+        }
+
+        .blp-dark-mode .blp-search-input {
+            background-color: #333 !important;
+            border-color: #505050 !important;
+            color: #e0e0e0 !important;
+        }
+
+        .blp-dark-mode .blp-search-hint {
+            color: #707070 !important;
+        }
+
+        .blp-dark-mode #blp-list-controls {
+            background: linear-gradient(135deg, #2a2a2a 0%, #252525 100%) !important;
+        }
+
+        .blp-dark-mode .blp-modal-window {
+            background: #2a2a2a !important;
+            color: #d0d0d0 !important;
+        }
+
+        .blp-dark-mode .blp-modal-pre {
+            background: #1e1e1e !important;
+            border-color: #404040 !important;
+            color: #d0d0d0 !important;
+        }
+
+        .blp-dark-mode .blp-settings-item label {
+            color: #b0b0b0 !important;
+        }
+
+        /* Dark mode toggle button */
+        #blp-dark-mode-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #444 0%, #222 100%);
+            border: 2px solid #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            z-index: 9998;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        #blp-dark-mode-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        body:not(.blp-dark-mode) #blp-dark-mode-toggle {
+            background: linear-gradient(135deg, #f0f0f0 0%, #ddd 100%);
+            border-color: #ccc;
         }
     `;
 
@@ -1841,6 +2387,7 @@
             const content = Utils.createElement('div', { className: 'blp-settings-grid' });
 
             const settings = [
+                { key: 'darkMode', label: '🌙 Tryb ciemny' },
                 { key: 'showLoadTimer', label: 'Pokazuj czas ładowania strony' },
                 { key: 'clearDateFrom', label: "Czyść datę 'Od' na liście zleceń" },
                 { key: 'enableKeyboardShortcuts', label: 'Włącz skróty klawiaturowe' },
@@ -1857,6 +2404,10 @@
                 checkbox.checked = Storage.getConfig(setting.key);
                 checkbox.addEventListener('change', () => {
                     Storage.setConfig(setting.key, checkbox.checked);
+                    // Specjalna obsługa dark mode - natychmiast zastosuj
+                    if (setting.key === 'darkMode') {
+                        DarkMode.toggle(checkbox.checked);
+                    }
                 });
 
                 const label = Utils.createElement('label', {
@@ -1886,6 +2437,56 @@
             content.appendChild(versionInfo);
 
             UI.showModal(content, { title: '⚙️ Ustawienia BLPaczka', width: '500px' });
+        }
+    };
+
+    // ================= MODUŁ: DARK MODE =================
+    const DarkMode = {
+        init() {
+            // Zastosuj zapisany stan
+            const isDark = Storage.getConfig('darkMode');
+            if (isDark) {
+                this.toggle(true);
+            }
+
+            // Dodaj przycisk toggle
+            this.addToggleButton();
+        },
+
+        toggle(enable) {
+            if (enable) {
+                document.documentElement.classList.add('blp-dark-mode');
+                document.body.classList.add('blp-dark-mode');
+            } else {
+                document.documentElement.classList.remove('blp-dark-mode');
+                document.body.classList.remove('blp-dark-mode');
+            }
+            this.updateToggleButton(enable);
+        },
+
+        addToggleButton() {
+            if (Utils.$('#blp-dark-mode-toggle')) return;
+
+            const isDark = Storage.getConfig('darkMode');
+            const btn = Utils.createElement('button', {
+                id: 'blp-dark-mode-toggle',
+                title: 'Przełącz tryb ciemny',
+                innerHTML: isDark ? '☀️' : '🌙',
+                onClick: () => {
+                    const newState = !document.body.classList.contains('blp-dark-mode');
+                    Storage.setConfig('darkMode', newState);
+                    this.toggle(newState);
+                }
+            });
+
+            document.body.appendChild(btn);
+        },
+
+        updateToggleButton(isDark) {
+            const btn = Utils.$('#blp-dark-mode-toggle');
+            if (btn) {
+                btn.innerHTML = isDark ? '☀️' : '🌙';
+            }
         }
     };
 
@@ -1936,9 +2537,16 @@
     // ================= ROUTER - GŁÓWNA LOGIKA =================
     function initRouter() {
         const path = window.location.pathname;
+        const host = window.location.hostname;
+        const isAdminPanel = host.includes('api.blpaczka.com');
 
-        // Zawsze inicjalizuj podstawowe moduły
-        SearchPanel.init();
+        // Moduły tylko dla panelu admina (api.blpaczka.com)
+        if (isAdminPanel) {
+            SearchPanel.init();
+            DarkMode.init();  // Tryb ciemny
+        }
+        
+        // Pozostałe moduły
         LoadTimer.init();
         BlockProtection.init();  // Ochrona przed blokadą - zawsze aktywna
 
