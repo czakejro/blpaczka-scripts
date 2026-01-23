@@ -21,9 +21,9 @@
         email: 'reklamacje@blpaczka.com',
         companyName: 'BL Logistics sp. z.o.o.',
         userType: 'Payer', // Płatnik
-        accountNumber: '39 1140 1140 0000 3902 8700 1001',
+        accountNumber: '48 1140 1140 0000 3902 8700 1033',
         street: 'Czerska',
-        houseNumber: '8/7',
+        houseNumber: '8/10',
         postCode: '00-732',
         city: 'Warszawa'
     };
