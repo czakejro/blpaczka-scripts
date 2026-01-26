@@ -209,12 +209,12 @@
         .pdf-document {
             background: #fff;
             color: #000;
-            padding: 50px;
+            padding: 40px;
             font-family: 'Times New Roman', Times, serif;
             font-size: 12pt;
             line-height: 1.5;
-            width: 210mm;
-            min-height: 297mm;
+            width: 100%;
+            max-width: 800px;
         }
 
         .pdf-header {
@@ -346,9 +346,6 @@
             background: #fff;
             border-radius: 8px;
             overflow: hidden;
-            transform: scale(0.7);
-            transform-origin: top left;
-            width: 142.8%;
         }
     </style>
 </head>
@@ -662,20 +659,20 @@
         }
 
         function generatePDF() {
-            // Użyj widocznego podglądu
             const element = document.getElementById('preview');
             const notaNumer = document.getElementById('nota_numer').value || 'nota';
             const notaData = document.getElementById('nota_data').value || new Date().toISOString().split('T')[0];
 
             const opt = {
-                margin: [10, 10, 10, 10],
+                margin: [15, 15, 15, 15],
                 filename: `Nota_ksiegowa_${notaNumer.replace(/\//g, '-')}_${notaData}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
                     scale: 2,
                     useCORS: true,
                     logging: false,
-                    backgroundColor: '#ffffff'
+                    backgroundColor: '#ffffff',
+                    width: 800
                 },
                 jsPDF: { 
                     unit: 'mm', 
@@ -684,18 +681,7 @@
                 }
             };
 
-            // Tymczasowo usuń transformację scale z wrappera
-            const wrapper = document.querySelector('.preview-wrapper');
-            const originalTransform = wrapper.style.transform;
-            const originalWidth = wrapper.style.width;
-            wrapper.style.transform = 'none';
-            wrapper.style.width = '210mm';
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Przywróć oryginalne style
-                wrapper.style.transform = originalTransform;
-                wrapper.style.width = originalWidth;
-            });
+            html2pdf().set(opt).from(element).save();
         }
     </script>
 </body>
