@@ -4,348 +4,223 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generator Noty Księgowej - FedEx</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
             padding: 40px 20px;
             color: #fff;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        .container { max-width: 900px; margin: 0 auto; }
 
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
+        header { text-align: center; margin-bottom: 40px; }
         header h1 {
             font-size: 2rem;
             margin-bottom: 10px;
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
-
-        header p {
-            color: #888;
-            font-size: 1rem;
-        }
+        header p { color: #888; }
 
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
             color: #4fc3f7;
             text-decoration: none;
-            font-size: 0.9rem;
         }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
+        .back-link:hover { text-decoration: underline; }
 
         .form-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 16px;
-            padding: 30px;
+            padding: 25px;
             margin-bottom: 20px;
         }
-
         .form-card h2 {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: #fff;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-bottom: 15px;
         }
+        .form-row.single { grid-template-columns: 1fr; }
 
-        .form-row.single {
-            grid-template-columns: 1fr;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
+        .form-group { display: flex; flex-direction: column; }
         .form-group label {
             color: #aaa;
-            font-size: 0.85rem;
-            margin-bottom: 6px;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .form-group input, .form-group select {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 8px;
-            padding: 12px 14px;
+            padding: 10px 12px;
             color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            font-size: 0.95rem;
         }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
-            border-color: rgba(102, 126, 234, 0.6);
-            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(102,126,234,0.6);
         }
-
-        .form-group input::placeholder {
-            color: #666;
-        }
-
-        .form-group select {
-            cursor: pointer;
-        }
-
-        .form-group select option {
-            background: #1e1e1e;
-            color: #fff;
-        }
+        .form-group select option { background: #1e1e1e; }
 
         .readonly-field {
-            background: rgba(102, 126, 234, 0.1) !important;
-            border-color: rgba(102, 126, 234, 0.3) !important;
+            background: rgba(102,126,234,0.1) !important;
             color: #81c784 !important;
         }
 
-        .hint {
-            font-size: 0.75rem;
-            color: #666;
-            margin-top: 4px;
-        }
+        .hint { font-size: 0.7rem; color: #666; margin-top: 3px; }
 
         .buttons {
             display: flex;
             gap: 15px;
-            margin-top: 30px;
+            margin: 30px 0;
         }
-
         .btn {
             flex: 1;
-            padding: 14px 28px;
+            padding: 14px;
             border-radius: 10px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
             border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
         }
-
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
         }
-
-        .btn-primary:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-
+        .btn-primary:hover { transform: scale(1.02); }
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.1);
             color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .preview-section {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255,255,255,0.03);
             border-radius: 16px;
-            padding: 30px;
-            margin-top: 30px;
+            padding: 25px;
         }
+        .preview-section h3 { margin-bottom: 20px; }
 
-        .preview-section h3 {
-            margin-bottom: 20px;
-            color: #fff;
-        }
-
-        .info-box {
-            background: rgba(33, 150, 243, 0.1);
-            border: 1px solid rgba(33, 150, 243, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            color: #64b5f6;
-            font-size: 0.9rem;
-        }
-
-        /* STYLE DLA PDF */
-        .pdf-document {
+        /* ===== DOKUMENT PDF ===== */
+        #document-container {
             background: #fff;
+            padding: 60px;
             color: #000;
-            padding: 40px;
             font-family: 'Times New Roman', Times, serif;
-            font-size: 12pt;
-            line-height: 1.5;
-            width: 100%;
-            max-width: 800px;
+            font-size: 14px;
+            line-height: 1.6;
+            width: 210mm;
+            min-height: 297mm;
         }
 
-        .pdf-header {
+        .doc-header {
             display: flex;
             justify-content: space-between;
+            margin-bottom: 50px;
+        }
+
+        .doc-stamp {
+            border: 2px dashed #888;
+            padding: 15px 25px;
+            text-align: center;
+            min-width: 220px;
+        }
+        .doc-stamp-title {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .doc-stamp-company { font-weight: bold; }
+        .doc-stamp-address { font-size: 13px; margin-top: 5px; }
+        .doc-stamp-nip { font-size: 12px; margin-top: 5px; }
+
+        .doc-recipient { text-align: right; }
+        .doc-recipient-label { margin-bottom: 5px; }
+        .doc-recipient-name { font-weight: bold; font-size: 15px; }
+
+        .doc-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 50px 0 15px 0;
+            letter-spacing: 3px;
+        }
+
+        .doc-subtitle {
+            text-align: center;
             margin-bottom: 40px;
         }
 
-        .pdf-stamp {
-            border: 2px dashed #999;
-            padding: 15px 20px;
-            text-align: center;
-            color: #666;
-            font-style: italic;
-            font-size: 10pt;
-            min-width: 180px;
-        }
+        .doc-intro { margin-bottom: 25px; }
 
-        .pdf-stamp .company-info {
-            margin-top: 10px;
-            font-style: normal;
-            color: #000;
-            font-size: 10pt;
-        }
-
-        .pdf-address {
-            text-align: right;
-            font-size: 11pt;
-        }
-
-        .pdf-address strong {
-            font-size: 12pt;
-        }
-
-        .pdf-title {
-            text-align: center;
-            font-size: 18pt;
-            font-weight: bold;
-            margin: 40px 0 10px 0;
-            letter-spacing: 2px;
-        }
-
-        .pdf-subtitle {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 11pt;
-        }
-
-        .pdf-intro {
-            margin-bottom: 20px;
-            font-size: 11pt;
-        }
-
-        .pdf-table {
+        .doc-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin-bottom: 30px;
         }
-
-        .pdf-table th,
-        .pdf-table td {
+        .doc-table th, .doc-table td {
             border: 1px solid #000;
             padding: 15px;
-            text-align: left;
             vertical-align: top;
         }
-
-        .pdf-table th {
-            background: #f0f0f0;
-            font-weight: bold;
-            font-size: 11pt;
-        }
-
-        .pdf-table .kwota-cell {
+        .doc-table th { background: #f5f5f5; font-weight: bold; }
+        .doc-table .col-kwota {
+            width: 130px;
             text-align: center;
-            font-weight: bold;
-            font-size: 14pt;
-            width: 120px;
             vertical-align: middle;
+            font-size: 16px;
+            font-weight: bold;
         }
+        .doc-table .col-tresc { line-height: 1.8; }
 
-        .pdf-table .tresc-cell {
-            font-size: 11pt;
-            line-height: 1.8;
-        }
-
-        .pdf-signatures {
+        .doc-signatures {
             display: flex;
             justify-content: space-between;
-            margin-top: 80px;
-            padding: 0 30px;
+            margin-top: 100px;
+            padding: 0 50px;
         }
-
-        .pdf-signature-box {
+        .doc-signature {
             text-align: center;
-            width: 180px;
+            width: 200px;
         }
-
-        .pdf-signature-line {
+        .doc-signature-line {
             border-top: 1px solid #000;
-            margin-top: 60px;
-            padding-top: 8px;
-            font-size: 10pt;
+            padding-top: 10px;
+            margin-top: 80px;
+            font-size: 13px;
         }
-
-        .pdf-signature-note {
-            font-size: 8pt;
+        .doc-signature-note {
+            font-size: 10px;
             color: #666;
             margin-top: 5px;
         }
 
-        @media (max-width: 600px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .buttons {
-                flex-direction: column;
-            }
-
-            .pdf-document {
-                width: 100%;
-                padding: 20px;
-            }
-        }
-
-        /* Podgląd na stronie */
-        .preview-wrapper {
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
+        @media (max-width: 900px) {
+            #document-container { width: 100%; padding: 30px; min-height: auto; }
+            .form-row { grid-template-columns: 1fr; }
+            .buttons { flex-direction: column; }
         }
     </style>
 </head>
@@ -357,31 +232,6 @@
             <h1>📄 Generator Noty Księgowej</h1>
             <p>Generuj noty księgowe dla odszkodowań FedEx</p>
         </header>
-
-        <div class="info-box">
-            💡 Wypełnij formularz poniżej. Numer konta bankowego jest już uzupełniony. Po wypełnieniu kliknij "Generuj PDF" aby pobrać gotowy dokument.
-        </div>
-
-        <!-- DANE WYSTAWCY -->
-        <div class="form-card">
-            <h2>🏢 Dane wystawcy noty</h2>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Nazwa firmy</label>
-                    <input type="text" id="wystawca_nazwa" placeholder="np. BL Logistics sp. z o.o.">
-                </div>
-                <div class="form-group">
-                    <label>NIP</label>
-                    <input type="text" id="wystawca_nip" placeholder="np. 1234567890">
-                </div>
-            </div>
-            <div class="form-row single">
-                <div class="form-group">
-                    <label>Adres</label>
-                    <input type="text" id="wystawca_adres" placeholder="np. ul. Czerska 8/7, 00-732 Warszawa">
-                </div>
-            </div>
-        </div>
 
         <!-- DANE NOTY -->
         <div class="form-card">
@@ -423,7 +273,7 @@
                     <input type="text" id="przesylka_numer" placeholder="np. 794644790240">
                 </div>
                 <div class="form-group">
-                    <label>Data nadania przesyłki</label>
+                    <label>Data nadania</label>
                     <input type="date" id="przesylka_data">
                 </div>
             </div>
@@ -435,92 +285,103 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Kwota (PLN)</label>
-                    <input type="number" id="kwota" step="0.01" placeholder="np. 1500.00">
+                    <input type="number" id="kwota" step="0.01" placeholder="np. 1500.00" oninput="autoKwotaSlownie()">
                 </div>
                 <div class="form-group">
                     <label>Kwota słownie</label>
-                    <input type="text" id="kwota_slownie" placeholder="np. tysiąc pięćset złotych 00/100">
-                    <span class="hint">Zostanie uzupełnione automatycznie lub wpisz ręcznie</span>
+                    <input type="text" id="kwota_slownie" placeholder="uzupełni się automatycznie">
+                    <span class="hint">Możesz też wpisać ręcznie</span>
                 </div>
             </div>
         </div>
 
-        <!-- KONTO BANKOWE -->
+        <!-- DANE STAŁE -->
         <div class="form-card">
-            <h2>🏦 Konto bankowe</h2>
+            <h2>🏢 Dane stałe (BL Paczka)</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nazwa firmy</label>
+                    <input type="text" id="firma_nazwa" value="BL Logistics sp. z o.o." class="readonly-field" readonly>
+                </div>
+                <div class="form-group">
+                    <label>NIP</label>
+                    <input type="text" id="firma_nip" value="5213971463" class="readonly-field" readonly>
+                </div>
+            </div>
             <div class="form-row single">
                 <div class="form-group">
-                    <label>Numer rachunku</label>
+                    <label>Adres</label>
+                    <input type="text" id="firma_adres" value="ul. Czerska 8/10, 00-732 Warszawa" class="readonly-field" readonly>
+                </div>
+            </div>
+            <div class="form-row single">
+                <div class="form-group">
+                    <label>Numer konta bankowego</label>
                     <input type="text" id="konto" value="48 1140 1140 0000 3902 8700 1033" class="readonly-field" readonly>
-                    <span class="hint">Stały numer konta - nie można edytować</span>
                 </div>
             </div>
         </div>
 
         <div class="buttons">
-            <button class="btn btn-secondary" onclick="resetForm()">🔄 Wyczyść formularz</button>
+            <button class="btn btn-secondary" onclick="resetForm()">🔄 Wyczyść</button>
             <button class="btn btn-primary" onclick="generatePDF()">📥 Generuj PDF</button>
         </div>
 
-        <!-- PODGLĄD -->
+        <!-- PODGLĄD DOKUMENTU -->
         <div class="preview-section">
             <h3>👁️ Podgląd dokumentu</h3>
-            <div class="preview-wrapper">
-                <div class="pdf-document" id="preview">
-                    <div class="pdf-header">
-                        <div class="pdf-stamp">
-                            (Pieczątka firmowa<br>wystawcy noty)
-                            <div class="company-info">
-                                <span id="prev_firma"></span><br>
-                                <span id="prev_adres"></span>
-                            </div>
-                        </div>
-                        <div class="pdf-address">
-                            <strong>Adresat:</strong><br>
-                            <strong>FedEx Express Poland</strong><br>
-                            ul. Annopol 19<br>
-                            03-236 Warszawa
-                        </div>
+            
+            <div id="document-container">
+                <div class="doc-header">
+                    <div class="doc-stamp">
+                        <div class="doc-stamp-title">(Pieczątka firmowa wystawcy noty)</div>
+                        <div class="doc-stamp-company" id="doc_firma">BL Logistics sp. z o.o.</div>
+                        <div class="doc-stamp-address" id="doc_adres">ul. Czerska 8/10, 00-732 Warszawa</div>
+                        <div class="doc-stamp-nip">NIP: <span id="doc_nip">5213971463</span></div>
                     </div>
-
-                    <div class="pdf-title">NOTA KSIĘGOWA</div>
-                    <div class="pdf-subtitle">
-                        Nr <strong><span id="prev_numer">___</span></strong> z dnia <strong><span id="prev_data">___</span></strong><br>
-                        <span id="prev_typ">Oryginał</span>
+                    <div class="doc-recipient">
+                        <div class="doc-recipient-label">Adresat:</div>
+                        <div class="doc-recipient-name">FedEx Express Poland</div>
+                        <div>ul. Annopol 19</div>
+                        <div>03-236 Warszawa</div>
                     </div>
+                </div>
 
-                    <p class="pdf-intro">Prosimy o zgodne z nami zaksięgowanie następujących pozycji:</p>
+                <div class="doc-title">NOTA KSIĘGOWA</div>
+                <div class="doc-subtitle">
+                    Nr <strong id="doc_numer">___</strong> z dnia <strong id="doc_data">___</strong><br>
+                    <span id="doc_typ">Oryginał</span>
+                </div>
 
-                    <table class="pdf-table">
-                        <tr>
-                            <th>Obciążyliśmy</th>
-                            <th>TREŚĆ</th>
-                        </tr>
-                        <tr>
-                            <td class="kwota-cell">
-                                <span id="prev_kwota">___</span> zł
-                            </td>
-                            <td class="tresc-cell">
-                                Obciążamy Państwa kwotą <strong><span id="prev_kwota2">___</span> zł</strong> 
-                                (słownie: <em><span id="prev_slownie">___</span></em>)
-                                z tytułu odszkodowania za <span id="prev_rodzaj">uszkodzoną</span> przesyłkę 
-                                nr <strong><span id="prev_przesylka">___</span></strong> 
-                                z dnia <strong><span id="prev_przesylka_data">___</span></strong>.
-                                <br><br>
-                                Odszkodowanie prosimy przesłać na konto:<br>
-                                <strong><span id="prev_konto">48 1140 1140 0000 3902 8700 1033</span></strong>
-                            </td>
-                        </tr>
-                    </table>
+                <p class="doc-intro">Prosimy o zgodne z nami zaksięgowanie następujących pozycji:</p>
 
-                    <div class="pdf-signatures">
-                        <div class="pdf-signature-box">
-                            <div class="pdf-signature-line">sporządzający</div>
-                            <div class="pdf-signature-note">(podpis i pieczątka osoby upoważnionej)</div>
-                        </div>
-                        <div class="pdf-signature-box">
-                            <div class="pdf-signature-line">akceptujący</div>
-                        </div>
+                <table class="doc-table">
+                    <tr>
+                        <th>Obciążyliśmy</th>
+                        <th>TREŚĆ</th>
+                    </tr>
+                    <tr>
+                        <td class="col-kwota"><span id="doc_kwota">___</span> zł</td>
+                        <td class="col-tresc">
+                            Obciążamy Państwa kwotą <strong><span id="doc_kwota2">___</span> zł</strong>
+                            (słownie: <em><span id="doc_slownie">___</span></em>)
+                            z tytułu odszkodowania za <span id="doc_rodzaj">uszkodzoną</span> przesyłkę
+                            nr <strong><span id="doc_przesylka">___</span></strong>
+                            z dnia <strong><span id="doc_przesylka_data">___</span></strong>.
+                            <br><br>
+                            Odszkodowanie prosimy przesłać na konto:<br>
+                            <strong><span id="doc_konto">48 1140 1140 0000 3902 8700 1033</span></strong>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="doc-signatures">
+                    <div class="doc-signature">
+                        <div class="doc-signature-line">sporządzający</div>
+                        <div class="doc-signature-note">(podpis i pieczątka)</div>
+                    </div>
+                    <div class="doc-signature">
+                        <div class="doc-signature-line">akceptujący</div>
                     </div>
                 </div>
             </div>
@@ -528,160 +389,156 @@
     </div>
 
     <script>
-        // Ustaw dzisiejszą datę jako domyślną
+        // Ustaw dzisiejszą datę
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('nota_data').value = today;
             updatePreview();
         });
 
-        // Aktualizuj podgląd przy każdej zmianie
+        // Aktualizuj podgląd przy zmianach
         document.querySelectorAll('input, select').forEach(el => {
             el.addEventListener('input', updatePreview);
             el.addEventListener('change', updatePreview);
         });
 
-        // Automatyczne generowanie kwoty słownie
-        document.getElementById('kwota').addEventListener('input', function() {
-            const kwota = parseFloat(this.value);
-            if (!isNaN(kwota)) {
-                document.getElementById('kwota_slownie').value = numberToWords(kwota);
-            }
-            updatePreview();
-        });
-
-        function updatePreview() {
-            const getValue = (id) => document.getElementById(id).value || '___';
-            const formatDate = (dateStr) => {
-                if (!dateStr) return '___';
-                const d = new Date(dateStr);
-                return d.toLocaleDateString('pl-PL');
-            };
-
-            // Podgląd
-            document.getElementById('prev_firma').textContent = getValue('wystawca_nazwa');
-            document.getElementById('prev_adres').textContent = getValue('wystawca_adres');
-            document.getElementById('prev_numer').textContent = getValue('nota_numer');
-            document.getElementById('prev_data').textContent = formatDate(document.getElementById('nota_data').value);
-            document.getElementById('prev_typ').textContent = getValue('nota_typ');
-            document.getElementById('prev_kwota').textContent = getValue('kwota');
-            document.getElementById('prev_kwota2').textContent = getValue('kwota');
-            document.getElementById('prev_slownie').textContent = getValue('kwota_slownie');
-            document.getElementById('prev_rodzaj').textContent = getValue('szkoda_rodzaj');
-            document.getElementById('prev_przesylka').textContent = getValue('przesylka_numer');
-            document.getElementById('prev_przesylka_data').textContent = formatDate(document.getElementById('przesylka_data').value);
-            document.getElementById('prev_konto').textContent = getValue('konto');
+        function formatDate(dateStr) {
+            if (!dateStr) return '___';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('pl-PL');
         }
 
-        function numberToWords(number) {
+        function updatePreview() {
+            const get = id => document.getElementById(id).value || '___';
+            
+            document.getElementById('doc_firma').textContent = get('firma_nazwa');
+            document.getElementById('doc_adres').textContent = get('firma_adres');
+            document.getElementById('doc_nip').textContent = get('firma_nip');
+            document.getElementById('doc_numer').textContent = get('nota_numer');
+            document.getElementById('doc_data').textContent = formatDate(document.getElementById('nota_data').value);
+            document.getElementById('doc_typ').textContent = get('nota_typ');
+            document.getElementById('doc_kwota').textContent = get('kwota');
+            document.getElementById('doc_kwota2').textContent = get('kwota');
+            document.getElementById('doc_slownie').textContent = get('kwota_slownie');
+            document.getElementById('doc_rodzaj').textContent = get('szkoda_rodzaj');
+            document.getElementById('doc_przesylka').textContent = get('przesylka_numer');
+            document.getElementById('doc_przesylka_data').textContent = formatDate(document.getElementById('przesylka_data').value);
+            document.getElementById('doc_konto').textContent = get('konto');
+        }
+
+        function autoKwotaSlownie() {
+            const kwota = parseFloat(document.getElementById('kwota').value);
+            if (!isNaN(kwota) && kwota > 0) {
+                document.getElementById('kwota_slownie').value = numberToWords(kwota);
+            }
+        }
+
+        function numberToWords(num) {
             const jednosci = ['', 'jeden', 'dwa', 'trzy', 'cztery', 'pięć', 'sześć', 'siedem', 'osiem', 'dziewięć'];
             const nastki = ['dziesięć', 'jedenaście', 'dwanaście', 'trzynaście', 'czternaście', 'piętnaście', 'szesnaście', 'siedemnaście', 'osiemnaście', 'dziewiętnaście'];
             const dziesiatki = ['', 'dziesięć', 'dwadzieścia', 'trzydzieści', 'czterdzieści', 'pięćdziesiąt', 'sześćdziesiąt', 'siedemdziesiąt', 'osiemdziesiąt', 'dziewięćdziesiąt'];
             const setki = ['', 'sto', 'dwieście', 'trzysta', 'czterysta', 'pięćset', 'sześćset', 'siedemset', 'osiemset', 'dziewięćset'];
 
-            if (number === 0) return 'zero złotych 00/100';
-
-            const zlote = Math.floor(number);
-            const grosze = Math.round((number - zlote) * 100);
+            const zlote = Math.floor(num);
+            const grosze = Math.round((num - zlote) * 100);
+            
+            if (zlote === 0) return 'zero złotych ' + grosze.toString().padStart(2, '0') + '/100';
 
             let result = '';
 
             // Tysiące
             if (zlote >= 1000) {
                 const tys = Math.floor(zlote / 1000);
-                if (tys === 1) {
-                    result += 'tysiąc ';
-                } else if (tys >= 2 && tys <= 4) {
-                    result += jednosci[tys] + ' tysiące ';
-                } else if (tys >= 5 && tys <= 9) {
-                    result += jednosci[tys] + ' tysięcy ';
-                } else if (tys >= 10 && tys <= 19) {
-                    result += nastki[tys - 10] + ' tysięcy ';
-                } else if (tys >= 20) {
-                    const d = Math.floor(tys / 10);
-                    const j = tys % 10;
-                    result += dziesiatki[d] + ' ';
-                    if (j > 0) {
-                        if (j >= 2 && j <= 4) {
-                            result += jednosci[j] + ' tysiące ';
-                        } else {
-                            result += jednosci[j] + ' tysięcy ';
-                        }
-                    } else {
-                        result += 'tysięcy ';
-                    }
-                }
+                if (tys === 1) result += 'tysiąc ';
+                else if (tys >= 2 && tys <= 4) result += jednosci[tys] + ' tysiące ';
+                else result += jednosci[tys] + ' tysięcy ';
             }
 
-            // Setki, dziesiątki, jedności
+            // Setki
             const reszta = zlote % 1000;
             const s = Math.floor(reszta / 100);
-            const d = Math.floor((reszta % 100) / 10);
-            const j = reszta % 10;
-
             if (s > 0) result += setki[s] + ' ';
 
-            if (d === 1) {
-                result += nastki[j] + ' ';
+            // Dziesiątki i jedności
+            const dd = reszta % 100;
+            if (dd >= 10 && dd <= 19) {
+                result += nastki[dd - 10] + ' ';
             } else {
+                const d = Math.floor(dd / 10);
+                const j = dd % 10;
                 if (d > 0) result += dziesiatki[d] + ' ';
                 if (j > 0) result += jednosci[j] + ' ';
             }
 
             // Złotych
-            const ostatnia = zlote % 10;
-            const przedostatnia = Math.floor((zlote % 100) / 10);
-            if (zlote === 1) {
-                result += 'złoty';
-            } else if (przedostatnia !== 1 && (ostatnia >= 2 && ostatnia <= 4)) {
-                result += 'złote';
-            } else {
-                result += 'złotych';
-            }
+            const ost = zlote % 10;
+            const przed = Math.floor((zlote % 100) / 10);
+            if (zlote === 1) result += 'złoty';
+            else if (przed !== 1 && ost >= 2 && ost <= 4) result += 'złote';
+            else result += 'złotych';
 
-            // Grosze
-            result += ' ' + grosze.toString().padStart(2, '0') + '/100';
-
-            return result.trim();
+            return result.trim() + ' ' + grosze.toString().padStart(2, '0') + '/100';
         }
 
         function resetForm() {
-            document.querySelectorAll('input:not([readonly]), select').forEach(el => {
-                if (el.type === 'date') {
-                    el.value = new Date().toISOString().split('T')[0];
-                } else if (el.tagName === 'SELECT') {
-                    el.selectedIndex = 0;
-                } else {
-                    el.value = '';
-                }
-            });
+            document.getElementById('nota_numer').value = '';
+            document.getElementById('nota_data').value = new Date().toISOString().split('T')[0];
+            document.getElementById('nota_typ').selectedIndex = 0;
+            document.getElementById('szkoda_rodzaj').selectedIndex = 0;
+            document.getElementById('przesylka_numer').value = '';
+            document.getElementById('przesylka_data').value = '';
+            document.getElementById('kwota').value = '';
+            document.getElementById('kwota_slownie').value = '';
             updatePreview();
         }
 
-        function generatePDF() {
-            const element = document.getElementById('preview');
-            const notaNumer = document.getElementById('nota_numer').value || 'nota';
-            const notaData = document.getElementById('nota_data').value || new Date().toISOString().split('T')[0];
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('document-container');
+            
+            // Pokaż loader
+            const btn = document.querySelector('.btn-primary');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Generowanie...';
+            btn.disabled = true;
 
-            const opt = {
-                margin: [15, 15, 15, 15],
-                filename: `Nota_ksiegowa_${notaNumer.replace(/\//g, '-')}_${notaData}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
+            try {
+                // Renderuj HTML do canvas
+                const canvas = await html2canvas(element, {
                     scale: 2,
                     useCORS: true,
                     logging: false,
-                    backgroundColor: '#ffffff',
-                    width: 800
-                },
-                jsPDF: { 
-                    unit: 'mm', 
-                    format: 'a4', 
-                    orientation: 'portrait' 
-                }
-            };
+                    backgroundColor: '#ffffff'
+                });
 
-            html2pdf().set(opt).from(element).save();
+                // Utwórz PDF
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                
+                // Oblicz proporcje
+                const imgWidth = pageWidth - 20; // 10mm margines z każdej strony
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                // Dodaj obraz do PDF
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                pdf.addImage(imgData, 'JPEG', 10, 10, imgWidth, imgHeight);
+
+                // Nazwa pliku
+                const numer = document.getElementById('nota_numer').value || 'nota';
+                const data = document.getElementById('nota_data').value || new Date().toISOString().split('T')[0];
+                const filename = `Nota_ksiegowa_${numer.replace(/\//g, '-')}_${data}.pdf`;
+
+                // Zapisz
+                pdf.save(filename);
+            } catch (error) {
+                console.error('Błąd generowania PDF:', error);
+                alert('Wystąpił błąd podczas generowania PDF. Spróbuj ponownie.');
+            }
+
+            // Przywróć przycisk
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
     </script>
 </body>
