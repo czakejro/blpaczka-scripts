@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generator Noty Księgowej - FedEx</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -120,11 +120,6 @@
             color: #666;
         }
 
-        .form-group textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
         .form-group select {
             cursor: pointer;
         }
@@ -200,85 +195,6 @@
             color: #fff;
         }
 
-        .preview-box {
-            background: #fff;
-            color: #000;
-            padding: 40px;
-            border-radius: 8px;
-            font-family: 'Times New Roman', serif;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .preview-box .header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-        }
-
-        .preview-box .stamp {
-            border: 2px dashed #999;
-            padding: 20px;
-            text-align: center;
-            color: #999;
-            font-style: italic;
-            min-width: 200px;
-        }
-
-        .preview-box .address {
-            text-align: right;
-        }
-
-        .preview-box .title {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            margin: 30px 0;
-        }
-
-        .preview-box .subtitle {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #666;
-        }
-
-        .preview-box table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-
-        .preview-box table th,
-        .preview-box table td {
-            border: 1px solid #000;
-            padding: 12px;
-            text-align: left;
-            vertical-align: top;
-        }
-
-        .preview-box table th {
-            background: #f0f0f0;
-            font-weight: bold;
-        }
-
-        .preview-box .signatures {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 60px;
-            text-align: center;
-        }
-
-        .preview-box .signature-box {
-            width: 200px;
-        }
-
-        .preview-box .signature-line {
-            border-top: 1px solid #000;
-            margin-top: 60px;
-            padding-top: 5px;
-            font-size: 12px;
-        }
-
         .info-box {
             background: rgba(33, 150, 243, 0.1);
             border: 1px solid rgba(33, 150, 243, 0.3);
@@ -287,6 +203,127 @@
             margin-bottom: 20px;
             color: #64b5f6;
             font-size: 0.9rem;
+        }
+
+        /* STYLE DLA PDF */
+        .pdf-document {
+            background: #fff;
+            color: #000;
+            padding: 50px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            width: 210mm;
+            min-height: 297mm;
+        }
+
+        .pdf-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .pdf-stamp {
+            border: 2px dashed #999;
+            padding: 15px 20px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            font-size: 10pt;
+            min-width: 180px;
+        }
+
+        .pdf-stamp .company-info {
+            margin-top: 10px;
+            font-style: normal;
+            color: #000;
+            font-size: 10pt;
+        }
+
+        .pdf-address {
+            text-align: right;
+            font-size: 11pt;
+        }
+
+        .pdf-address strong {
+            font-size: 12pt;
+        }
+
+        .pdf-title {
+            text-align: center;
+            font-size: 18pt;
+            font-weight: bold;
+            margin: 40px 0 10px 0;
+            letter-spacing: 2px;
+        }
+
+        .pdf-subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 11pt;
+        }
+
+        .pdf-intro {
+            margin-bottom: 20px;
+            font-size: 11pt;
+        }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .pdf-table th,
+        .pdf-table td {
+            border: 1px solid #000;
+            padding: 15px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .pdf-table th {
+            background: #f0f0f0;
+            font-weight: bold;
+            font-size: 11pt;
+        }
+
+        .pdf-table .kwota-cell {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14pt;
+            width: 120px;
+            vertical-align: middle;
+        }
+
+        .pdf-table .tresc-cell {
+            font-size: 11pt;
+            line-height: 1.8;
+        }
+
+        .pdf-signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 80px;
+            padding: 0 30px;
+        }
+
+        .pdf-signature-box {
+            text-align: center;
+            width: 180px;
+        }
+
+        .pdf-signature-line {
+            border-top: 1px solid #000;
+            margin-top: 60px;
+            padding-top: 8px;
+            font-size: 10pt;
+        }
+
+        .pdf-signature-note {
+            font-size: 8pt;
+            color: #666;
+            margin-top: 5px;
         }
 
         @media (max-width: 600px) {
@@ -298,19 +335,27 @@
                 flex-direction: column;
             }
 
-            .preview-box {
+            .pdf-document {
+                width: 100%;
                 padding: 20px;
-                font-size: 12px;
             }
+        }
 
-            .preview-box .header {
-                flex-direction: column;
-                gap: 20px;
-            }
+        /* Ukryj dokument PDF podczas normalnego przeglądania */
+        #pdf-content {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+        }
 
-            .preview-box .address {
-                text-align: left;
-            }
+        /* Podgląd na stronie */
+        .preview-wrapper {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            transform: scale(0.7);
+            transform-origin: top left;
+            width: 142.8%;
         }
     </style>
 </head>
@@ -430,54 +475,124 @@
         <!-- PODGLĄD -->
         <div class="preview-section">
             <h3>👁️ Podgląd dokumentu</h3>
-            <div class="preview-box" id="preview">
-                <div class="header">
-                    <div class="stamp">(Pieczątka firmowa wystawcy noty)</div>
-                    <div class="address">
-                        <strong>Adresat:</strong><br>
-                        FedEx Express Poland<br>
-                        ul. Annopol 19<br>
-                        03-236 Warszawa
+            <div class="preview-wrapper">
+                <div class="pdf-document" id="preview">
+                    <div class="pdf-header">
+                        <div class="pdf-stamp">
+                            (Pieczątka firmowa<br>wystawcy noty)
+                            <div class="company-info">
+                                <span id="prev_firma"></span><br>
+                                <span id="prev_adres"></span>
+                            </div>
+                        </div>
+                        <div class="pdf-address">
+                            <strong>Adresat:</strong><br>
+                            <strong>FedEx Express Poland</strong><br>
+                            ul. Annopol 19<br>
+                            03-236 Warszawa
+                        </div>
+                    </div>
+
+                    <div class="pdf-title">NOTA KSIĘGOWA</div>
+                    <div class="pdf-subtitle">
+                        Nr <strong><span id="prev_numer">___</span></strong> z dnia <strong><span id="prev_data">___</span></strong><br>
+                        <span id="prev_typ">Oryginał</span>
+                    </div>
+
+                    <p class="pdf-intro">Prosimy o zgodne z nami zaksięgowanie następujących pozycji:</p>
+
+                    <table class="pdf-table">
+                        <tr>
+                            <th>Obciążyliśmy</th>
+                            <th>TREŚĆ</th>
+                        </tr>
+                        <tr>
+                            <td class="kwota-cell">
+                                <span id="prev_kwota">___</span> zł
+                            </td>
+                            <td class="tresc-cell">
+                                Obciążamy Państwa kwotą <strong><span id="prev_kwota2">___</span> zł</strong> 
+                                (słownie: <em><span id="prev_slownie">___</span></em>)
+                                z tytułu odszkodowania za <span id="prev_rodzaj">uszkodzoną</span> przesyłkę 
+                                nr <strong><span id="prev_przesylka">___</span></strong> 
+                                z dnia <strong><span id="prev_przesylka_data">___</span></strong>.
+                                <br><br>
+                                Odszkodowanie prosimy przesłać na konto:<br>
+                                <strong><span id="prev_konto">48 1140 1140 0000 3902 8700 1033</span></strong>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="pdf-signatures">
+                        <div class="pdf-signature-box">
+                            <div class="pdf-signature-line">sporządzający</div>
+                            <div class="pdf-signature-note">(podpis i pieczątka osoby upoważnionej)</div>
+                        </div>
+                        <div class="pdf-signature-box">
+                            <div class="pdf-signature-line">akceptujący</div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="title">NOTA KSIĘGOWA</div>
-                <div class="subtitle">
-                    Nr <span id="prev_numer">___</span> z dnia <span id="prev_data">___</span><br>
-                    <span id="prev_typ">Oryginał</span>
+    <!-- Ukryty dokument do generowania PDF -->
+    <div id="pdf-content">
+        <div class="pdf-document" id="pdf-source">
+            <div class="pdf-header">
+                <div class="pdf-stamp">
+                    (Pieczątka firmowa<br>wystawcy noty)
+                    <div class="company-info">
+                        <span id="pdf_firma"></span><br>
+                        <span id="pdf_adres"></span>
+                    </div>
                 </div>
+                <div class="pdf-address">
+                    <strong>Adresat:</strong><br>
+                    <strong>FedEx Express Poland</strong><br>
+                    ul. Annopol 19<br>
+                    03-236 Warszawa
+                </div>
+            </div>
 
-                <p style="margin-bottom: 20px;">Prosimy o zgodne z nami zaksięgowanie następujących pozycji:</p>
+            <div class="pdf-title">NOTA KSIĘGOWA</div>
+            <div class="pdf-subtitle">
+                Nr <strong><span id="pdf_numer"></span></strong> z dnia <strong><span id="pdf_data"></span></strong><br>
+                <span id="pdf_typ">Oryginał</span>
+            </div>
 
-                <table>
-                    <tr>
-                        <th style="width: 150px;">Obciążyliśmy</th>
-                        <th>TREŚĆ</th>
-                    </tr>
-                    <tr>
-                        <td style="text-align: center; font-weight: bold; font-size: 16px;">
-                            <span id="prev_kwota">___</span> zł
-                        </td>
-                        <td>
-                            Obciążamy Państwa kwotą <strong><span id="prev_kwota2">___</span> zł</strong> 
-                            (słownie: <span id="prev_slownie">___</span>)
-                            z tytułu odszkodowania za <span id="prev_rodzaj">uszkodzoną</span> przesyłkę 
-                            nr <strong><span id="prev_przesylka">___</span></strong> 
-                            z dnia <span id="prev_przesylka_data">___</span>.
-                            <br><br>
-                            Odszkodowanie prosimy przesłać na konto:<br>
-                            <strong><span id="prev_konto">48 1140 1140 0000 3902 8700 1033</span></strong>
-                        </td>
-                    </tr>
-                </table>
+            <p class="pdf-intro">Prosimy o zgodne z nami zaksięgowanie następujących pozycji:</p>
 
-                <div class="signatures">
-                    <div class="signature-box">
-                        <div class="signature-line">sporządzający</div>
-                    </div>
-                    <div class="signature-box">
-                        <div class="signature-line">akceptujący</div>
-                    </div>
+            <table class="pdf-table">
+                <tr>
+                    <th>Obciążyliśmy</th>
+                    <th>TREŚĆ</th>
+                </tr>
+                <tr>
+                    <td class="kwota-cell">
+                        <span id="pdf_kwota"></span> zł
+                    </td>
+                    <td class="tresc-cell">
+                        Obciążamy Państwa kwotą <strong><span id="pdf_kwota2"></span> zł</strong> 
+                        (słownie: <em><span id="pdf_slownie"></span></em>)
+                        z tytułu odszkodowania za <span id="pdf_rodzaj">uszkodzoną</span> przesyłkę 
+                        nr <strong><span id="pdf_przesylka"></span></strong> 
+                        z dnia <strong><span id="pdf_przesylka_data"></span></strong>.
+                        <br><br>
+                        Odszkodowanie prosimy przesłać na konto:<br>
+                        <strong><span id="pdf_konto">48 1140 1140 0000 3902 8700 1033</span></strong>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="pdf-signatures">
+                <div class="pdf-signature-box">
+                    <div class="pdf-signature-line">sporządzający</div>
+                    <div class="pdf-signature-note">(podpis i pieczątka osoby upoważnionej)</div>
+                </div>
+                <div class="pdf-signature-box">
+                    <div class="pdf-signature-line">akceptujący</div>
                 </div>
             </div>
         </div>
@@ -503,6 +618,7 @@
             if (!isNaN(kwota)) {
                 document.getElementById('kwota_slownie').value = numberToWords(kwota);
             }
+            updatePreview();
         });
 
         function updatePreview() {
@@ -513,6 +629,9 @@
                 return d.toLocaleDateString('pl-PL');
             };
 
+            // Podgląd
+            document.getElementById('prev_firma').textContent = getValue('wystawca_nazwa');
+            document.getElementById('prev_adres').textContent = getValue('wystawca_adres');
             document.getElementById('prev_numer').textContent = getValue('nota_numer');
             document.getElementById('prev_data').textContent = formatDate(document.getElementById('nota_data').value);
             document.getElementById('prev_typ').textContent = getValue('nota_typ');
@@ -523,6 +642,29 @@
             document.getElementById('prev_przesylka').textContent = getValue('przesylka_numer');
             document.getElementById('prev_przesylka_data').textContent = formatDate(document.getElementById('przesylka_data').value);
             document.getElementById('prev_konto').textContent = getValue('konto');
+        }
+
+        function updatePdfContent() {
+            const getValue = (id) => document.getElementById(id).value || '';
+            const formatDate = (dateStr) => {
+                if (!dateStr) return '';
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('pl-PL');
+            };
+
+            // PDF content
+            document.getElementById('pdf_firma').textContent = getValue('wystawca_nazwa');
+            document.getElementById('pdf_adres').textContent = getValue('wystawca_adres');
+            document.getElementById('pdf_numer').textContent = getValue('nota_numer');
+            document.getElementById('pdf_data').textContent = formatDate(document.getElementById('nota_data').value);
+            document.getElementById('pdf_typ').textContent = getValue('nota_typ');
+            document.getElementById('pdf_kwota').textContent = getValue('kwota');
+            document.getElementById('pdf_kwota2').textContent = getValue('kwota');
+            document.getElementById('pdf_slownie').textContent = getValue('kwota_slownie');
+            document.getElementById('pdf_rodzaj').textContent = getValue('szkoda_rodzaj');
+            document.getElementById('pdf_przesylka').textContent = getValue('przesylka_numer');
+            document.getElementById('pdf_przesylka_data').textContent = formatDate(document.getElementById('przesylka_data').value);
+            document.getElementById('pdf_konto').textContent = getValue('konto');
         }
 
         function numberToWords(number) {
@@ -611,162 +753,43 @@
         }
 
         function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            // Aktualizuj zawartość PDF
+            updatePdfContent();
 
-            const getValue = (id) => document.getElementById(id).value || '';
-            const formatDate = (dateStr) => {
-                if (!dateStr) return '';
-                const d = new Date(dateStr);
-                return d.toLocaleDateString('pl-PL');
+            const element = document.getElementById('pdf-source');
+            const notaNumer = document.getElementById('nota_numer').value || 'nota';
+            const notaData = document.getElementById('nota_data').value || new Date().toISOString().split('T')[0];
+
+            const opt = {
+                margin: 10,
+                filename: `Nota_ksiegowa_${notaNumer.replace(/\//g, '-')}_${notaData}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                }
             };
 
-            // Konfiguracja
-            const marginLeft = 20;
-            const pageWidth = 210;
-            const contentWidth = pageWidth - 2 * marginLeft;
-            let y = 20;
+            // Tymczasowo pokaż element do renderowania
+            const pdfContent = document.getElementById('pdf-content');
+            pdfContent.style.position = 'fixed';
+            pdfContent.style.left = '0';
+            pdfContent.style.top = '0';
+            pdfContent.style.zIndex = '-1';
+            pdfContent.style.opacity = '1';
 
-            // Nagłówek - pieczątka i adresat
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-
-            // Pieczątka (lewa strona)
-            doc.setDrawColor(150);
-            doc.setLineDash([2, 2], 0);
-            doc.rect(marginLeft, y, 60, 35);
-            doc.setLineDash([]);
-            doc.setFontSize(8);
-            doc.text('(Piecz' + String.fromCharCode(261) + 'tka firmowa', marginLeft + 30, y + 15, { align: 'center' });
-            doc.text('wystawcy noty)', marginLeft + 30, y + 20, { align: 'center' });
-
-            // Dane wystawcy pod pieczątką
-            if (getValue('wystawca_nazwa')) {
-                doc.setFontSize(9);
-                doc.text(getValue('wystawca_nazwa'), marginLeft + 30, y + 28, { align: 'center' });
-                if (getValue('wystawca_adres')) {
-                    doc.setFontSize(8);
-                    doc.text(getValue('wystawca_adres'), marginLeft + 30, y + 33, { align: 'center' });
-                }
-            }
-
-            // Adresat (prawa strona)
-            doc.setFontSize(10);
-            doc.text('Adresat:', pageWidth - marginLeft - 50, y);
-            doc.setFont('helvetica', 'bold');
-            doc.text('FedEx Express Poland', pageWidth - marginLeft - 50, y + 6);
-            doc.setFont('helvetica', 'normal');
-            doc.text('ul. Annopol 19', pageWidth - marginLeft - 50, y + 12);
-            doc.text('03-236 Warszawa', pageWidth - marginLeft - 50, y + 18);
-
-            y += 50;
-
-            // Tytuł
-            doc.setFontSize(16);
-            doc.setFont('helvetica', 'bold');
-            doc.text('NOTA KSI' + String.fromCharCode(280) + 'GOWA', pageWidth / 2, y, { align: 'center' });
-
-            y += 10;
-
-            // Numer i data
-            doc.setFontSize(11);
-            doc.setFont('helvetica', 'normal');
-            const notaInfo = `Nr ${getValue('nota_numer')} z dnia ${formatDate(getValue('nota_data'))}`;
-            doc.text(notaInfo, pageWidth / 2, y, { align: 'center' });
-
-            y += 6;
-            doc.setFontSize(10);
-            doc.text(getValue('nota_typ'), pageWidth / 2, y, { align: 'center' });
-
-            y += 15;
-
-            // Treść
-            doc.setFontSize(10);
-            doc.text('Prosimy o zgodne z nami zaksi' + String.fromCharCode(281) + 'gowanie nast' + String.fromCharCode(281) + 'puj' + String.fromCharCode(261) + 'cych pozycji:', marginLeft, y);
-
-            y += 10;
-
-            // Tabela
-            const tableTop = y;
-            const col1Width = 35;
-            const col2Width = contentWidth - col1Width;
-
-            // Nagłówki tabeli
-            doc.setFillColor(240, 240, 240);
-            doc.rect(marginLeft, tableTop, col1Width, 10, 'F');
-            doc.rect(marginLeft + col1Width, tableTop, col2Width, 10, 'F');
-            doc.rect(marginLeft, tableTop, contentWidth, 10, 'S');
-            doc.line(marginLeft + col1Width, tableTop, marginLeft + col1Width, tableTop + 10);
-
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(9);
-            doc.text('Obci' + String.fromCharCode(261) + 'zylismy', marginLeft + col1Width / 2, tableTop + 7, { align: 'center' });
-            doc.text('TRE' + String.fromCharCode(346) + String.fromCharCode(262), marginLeft + col1Width + col2Width / 2, tableTop + 7, { align: 'center' });
-
-            // Treść tabeli
-            const contentTop = tableTop + 10;
-            const kwota = getValue('kwota');
-            const kwotaSlownie = getValue('kwota_slownie');
-            const rodzajSzkody = getValue('szkoda_rodzaj');
-            const nrPrzesylki = getValue('przesylka_numer');
-            const dataPrzesylki = formatDate(getValue('przesylka_data'));
-            const konto = getValue('konto');
-
-            // Kolumna z kwotą
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(12);
-            doc.text(kwota + ' z' + String.fromCharCode(322), marginLeft + col1Width / 2, contentTop + 30, { align: 'center' });
-
-            // Kolumna z treścią
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(10);
-
-            let textY = contentTop + 8;
-            const textX = marginLeft + col1Width + 5;
-            const maxWidth = col2Width - 10;
-
-            doc.text(`Obci' + String.fromCharCode(261) + 'zamy Pa' + String.fromCharCode(324) + 'stwa kwot' + String.fromCharCode(261) + ' ${kwota} z' + String.fromCharCode(322)`, textX, textY);
-            textY += 5;
-            doc.text(`(s' + String.fromCharCode(322) + 'ownie: ${kwotaSlownie})`, textX, textY);
-            textY += 5;
-            doc.text(`z tytu' + String.fromCharCode(322) + 'u odszkodowania za ${rodzajSzkody} przesy' + String.fromCharCode(322) + 'k' + String.fromCharCode(281)`, textX, textY);
-            textY += 5;
-            doc.setFont('helvetica', 'bold');
-            doc.text(`nr ${nrPrzesylki}`, textX, textY);
-            doc.setFont('helvetica', 'normal');
-            doc.text(` z dnia ${dataPrzesylki}.`, textX + doc.getTextWidth(`nr ${nrPrzesylki}`), textY);
-            textY += 10;
-            doc.text('Odszkodowanie prosimy przes' + String.fromCharCode(322) + 'a' + String.fromCharCode(263) + ' na konto:', textX, textY);
-            textY += 6;
-            doc.setFont('helvetica', 'bold');
-            doc.text(konto, textX, textY);
-
-            const tableHeight = textY - contentTop + 10;
-            doc.rect(marginLeft, contentTop, contentWidth, tableHeight, 'S');
-            doc.line(marginLeft + col1Width, contentTop, marginLeft + col1Width, contentTop + tableHeight);
-
-            y = contentTop + tableHeight + 30;
-
-            // Podpisy
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(10);
-
-            // Linie na podpisy
-            doc.line(marginLeft + 10, y + 20, marginLeft + 60, y + 20);
-            doc.line(pageWidth - marginLeft - 60, y + 20, pageWidth - marginLeft - 10, y + 20);
-
-            // Etykiety
-            doc.setFontSize(8);
-            doc.text('sporz' + String.fromCharCode(261) + 'dzaj' + String.fromCharCode(261) + 'cy', marginLeft + 35, y + 26, { align: 'center' });
-            doc.text('akceptuj' + String.fromCharCode(261) + 'cy', pageWidth - marginLeft - 35, y + 26, { align: 'center' });
-
-            // Tekst o pieczątce
-            doc.setFontSize(7);
-            doc.text('(podpis i piecz' + String.fromCharCode(261) + 'tka osoby upowa' + String.fromCharCode(380) + 'nionej)', marginLeft + 35, y + 32, { align: 'center' });
-
-            // Zapisz PDF
-            const fileName = `Nota_ksiegowa_${getValue('nota_numer').replace(/\//g, '-')}_${formatDate(getValue('nota_data'))}.pdf`;
-            doc.save(fileName);
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Ukryj z powrotem
+                pdfContent.style.position = 'absolute';
+                pdfContent.style.left = '-9999px';
+                pdfContent.style.zIndex = 'auto';
+            });
         }
     </script>
 </body>
