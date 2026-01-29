@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtr CSV - Usuwanie kolumn</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #fff;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        header { text-align: center; margin-bottom: 40px; }
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        header p { color: #888; }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4fc3f7;
+            text-decoration: none;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Dropzone */
+        .dropzone {
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 12px;
+            padding: 50px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.02);
+        }
+        .dropzone:hover, .dropzone.drag-over {
+            border-color: rgba(102,126,234,0.6);
+            background: rgba(102,126,234,0.1);
+        }
+        .dropzone-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.6;
+        }
+        .dropzone-text { color: #aaa; margin-bottom: 10px; }
+        .dropzone-hint { color: #666; font-size: 0.85rem; }
+        .dropzone input[type="file"] { display: none; }
+
+        /* File info */
+        .file-info {
+            display: none;
+            background: rgba(76,175,80,0.15);
+            border: 1px solid rgba(76,175,80,0.3);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-top: 15px;
+        }
+        .file-info.visible { display: flex; align-items: center; gap: 15px; }
+        .file-info-icon { font-size: 24px; }
+        .file-info-details { flex: 1; }
+        .file-info-name { font-weight: 600; color: #81c784; }
+        .file-info-stats { font-size: 0.85rem; color: #aaa; margin-top: 3px; }
+        .file-info-remove {
+            background: rgba(244,67,54,0.2);
+            border: none;
+            color: #ff6b6b;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .file-info-remove:hover { background: rgba(244,67,54,0.3); }
+
+        /* Columns to remove */
+        .columns-info {
+            background: rgba(255,193,7,0.1);
+            border: 1px solid rgba(255,193,7,0.3);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+        .columns-info h4 {
+            color: #ffc107;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        .columns-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .column-tag {
+            background: rgba(244,67,54,0.2);
+            color: #ff8a80;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-family: monospace;
+        }
+
+        /* Detected columns */
+        .detected-columns {
+            display: none;
+            margin-top: 20px;
+        }
+        .detected-columns.visible { display: block; }
+        .detected-columns h4 {
+            color: #4fc3f7;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        .detected-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .detected-tag {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-family: monospace;
+        }
+        .detected-tag.to-remove {
+            background: rgba(244,67,54,0.2);
+            color: #ff8a80;
+            text-decoration: line-through;
+        }
+        .detected-tag.to-keep {
+            background: rgba(76,175,80,0.2);
+            color: #81c784;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        .btn-primary:hover:not(:disabled) { transform: scale(1.02); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.15); }
+
+        /* Status messages */
+        .status {
+            display: none;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .status.visible { display: block; }
+        .status.success {
+            background: rgba(76,175,80,0.15);
+            border: 1px solid rgba(76,175,80,0.3);
+            color: #81c784;
+        }
+        .status.error {
+            background: rgba(244,67,54,0.15);
+            border: 1px solid rgba(244,67,54,0.3);
+            color: #ff8a80;
+        }
+        .status.info {
+            background: rgba(33,150,243,0.15);
+            border: 1px solid rgba(33,150,243,0.3);
+            color: #64b5f6;
+        }
+
+        /* Preview table */
+        .preview-section {
+            display: none;
+            margin-top: 20px;
+        }
+        .preview-section.visible { display: block; }
+        .preview-section h4 {
+            color: #aaa;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        .preview-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .preview-table th, .preview-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            white-space: nowrap;
+        }
+        .preview-table th {
+            background: rgba(102,126,234,0.2);
+            color: #a5b4fc;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        .preview-table td {
+            background: rgba(255,255,255,0.03);
+            color: #ccc;
+        }
+        .preview-table tr:hover td {
+            background: rgba(255,255,255,0.06);
+        }
+        .preview-note {
+            color: #666;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        /* Instructions */
+        .instructions {
+            background: rgba(33,150,243,0.1);
+            border: 1px solid rgba(33,150,243,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .instructions h3 {
+            color: #64b5f6;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+        .instructions ol {
+            color: #aaa;
+            padding-left: 20px;
+            line-height: 1.8;
+        }
+        .instructions li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Powrót do listy skryptów</a>
+
+        <header>
+            <h1>📊 Filtr CSV</h1>
+            <p>Usuwa zbędne kolumny z raportów CSV</p>
+        </header>
+
+        <!-- Kolumny do usunięcia -->
+        <div class="card">
+            <h2>🗑️ Kolumny do usunięcia</h2>
+            <div class="columns-info">
+                <h4>Następujące kolumny zostaną automatycznie usunięte:</h4>
+                <div class="columns-list" id="columnsToRemove"></div>
+            </div>
+        </div>
+
+        <!-- Upload -->
+        <div class="card">
+            <h2>📁 Załaduj plik CSV</h2>
+            
+            <div class="dropzone" id="dropzone">
+                <div class="dropzone-icon">📄</div>
+                <div class="dropzone-text">Przeciągnij plik CSV tutaj lub kliknij, aby wybrać</div>
+                <div class="dropzone-hint">Obsługiwane formaty: .csv (kodowanie UTF-8 lub Windows-1250)</div>
+                <input type="file" id="fileInput" accept=".csv">
+            </div>
+
+            <div class="file-info" id="fileInfo">
+                <div class="file-info-icon">✅</div>
+                <div class="file-info-details">
+                    <div class="file-info-name" id="fileName"></div>
+                    <div class="file-info-stats" id="fileStats"></div>
+                </div>
+                <button class="file-info-remove" onclick="clearFile()">✕ Usuń</button>
+            </div>
+
+            <div class="detected-columns" id="detectedColumns">
+                <h4>Wykryte kolumny:</h4>
+                <div class="detected-list" id="detectedList"></div>
+            </div>
+
+            <div class="status" id="status"></div>
+
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="clearFile()" id="btnClear" disabled>
+                    🗑️ Wyczyść
+                </button>
+                <button class="btn btn-primary" onclick="processFile()" id="btnProcess" disabled>
+                    ⚙️ Przetwórz i pobierz
+                </button>
+            </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="preview-section" id="previewSection">
+            <div class="card">
+                <h2>👁️ Podgląd (pierwsze 5 wierszy)</h2>
+                <div class="preview-wrapper">
+                    <table class="preview-table" id="previewTable"></table>
+                </div>
+                <div class="preview-note">Pokazano tylko pierwsze 5 wierszy z przefiltrowanych danych</div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <h3>📖 Jak używać?</h3>
+            <ol>
+                <li>Przeciągnij plik CSV na stronę lub kliknij aby go wybrać</li>
+                <li>Skrypt automatycznie wykryje i oznaczy kolumny do usunięcia</li>
+                <li>Kliknij "Przetwórz i pobierz" aby pobrać oczyszczony plik</li>
+                <li>Nowy plik będzie miał sufiks "_filtered" w nazwie</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Kolumny do usunięcia (case-insensitive)
+        const COLUMNS_TO_REMOVE = [
+            'ubezpieczenie',
+            'Wartość przesyłki do ubezpiecznia',
+            'kwota netto za ubezpieczenie',
+            'dopłata strefowa',
+            'kwota netto za strefę',
+            'stawka vat',
+            'stawka wynegocjowana netto',
+            'id_usera',
+            'typ_api',
+            'nr_faktury',
+            'Colected',
+            'Delivered',
+            'Status klienta',
+            'Potencjał klienta',
+            'Stawka podstawowa netto',
+            'Czas dostarczenia (dni robocze)',
+            'SLA',
+            'Cena netto paczki',
+            'Vat suma',
+            'typ klienta'
+        ];
+
+        // Normalize column name for comparison
+        function normalizeColumnName(name) {
+            return name.trim().toLowerCase();
+        }
+
+        // Create a set of normalized column names to remove
+        const columnsToRemoveNormalized = new Set(
+            COLUMNS_TO_REMOVE.map(normalizeColumnName)
+        );
+
+        // State
+        let csvData = null;
+        let csvHeaders = null;
+        let originalFileName = '';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Display columns to remove
+            const columnsContainer = document.getElementById('columnsToRemove');
+            COLUMNS_TO_REMOVE.forEach(col => {
+                const tag = document.createElement('span');
+                tag.className = 'column-tag';
+                tag.textContent = col;
+                columnsContainer.appendChild(tag);
+            });
+
+            // Setup drag and drop
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('fileInput');
+
+            dropzone.addEventListener('click', () => fileInput.click());
+            dropzone.addEventListener('dragover', handleDragOver);
+            dropzone.addEventListener('dragleave', handleDragLeave);
+            dropzone.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+        });
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        async function handleFile(file) {
+            // Validate file type
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                showStatus('Proszę wybrać plik CSV', 'error');
+                return;
+            }
+
+            originalFileName = file.name;
+
+            try {
+                // Try UTF-8 first, then Windows-1250
+                let text;
+                try {
+                    text = await readFileAsText(file, 'UTF-8');
+                    // Check if it looks like corrupted encoding
+                    if (text.includes('�')) {
+                        throw new Error('UTF-8 decoding produced replacement characters');
+                    }
+                } catch (e) {
+                    text = await readFileAsText(file, 'Windows-1250');
+                }
+
+                // Parse CSV
+                parseCSV(text);
+
+                // Update UI
+                document.getElementById('fileInfo').classList.add('visible');
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('fileStats').textContent = 
+                    `${csvData.length} wierszy, ${csvHeaders.length} kolumn`;
+                
+                // Show detected columns
+                showDetectedColumns();
+                
+                // Enable buttons
+                document.getElementById('btnClear').disabled = false;
+                document.getElementById('btnProcess').disabled = false;
+
+                showStatus(`Plik wczytany pomyślnie. Znaleziono ${getColumnsToRemoveCount()} kolumn do usunięcia.`, 'success');
+
+            } catch (error) {
+                console.error('Error reading file:', error);
+                showStatus('Błąd odczytu pliku: ' + error.message, 'error');
+            }
+        }
+
+        function readFileAsText(file, encoding) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = e => reject(new Error('Błąd odczytu pliku'));
+                
+                if (encoding === 'UTF-8') {
+                    reader.readAsText(file, 'UTF-8');
+                } else {
+                    reader.readAsText(file, encoding);
+                }
+            });
+        }
+
+        function parseCSV(text) {
+            // Detect delimiter (semicolon or comma)
+            const firstLine = text.split('\n')[0];
+            const delimiter = firstLine.includes(';') ? ';' : ',';
+
+            const lines = text.trim().split('\n');
+            csvHeaders = parseCSVLine(lines[0], delimiter);
+            csvData = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim()) {
+                    csvData.push(parseCSVLine(lines[i], delimiter));
+                }
+            }
+        }
+
+        function parseCSVLine(line, delimiter) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+
+                if (char === '"') {
+                    if (inQuotes && line[i + 1] === '"') {
+                        current += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === delimiter && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+
+            return result;
+        }
+
+        function showDetectedColumns() {
+            const container = document.getElementById('detectedList');
+            container.innerHTML = '';
+
+            csvHeaders.forEach(header => {
+                const tag = document.createElement('span');
+                const isToRemove = columnsToRemoveNormalized.has(normalizeColumnName(header));
+                tag.className = 'detected-tag ' + (isToRemove ? 'to-remove' : 'to-keep');
+                tag.textContent = header;
+                container.appendChild(tag);
+            });
+
+            document.getElementById('detectedColumns').classList.add('visible');
+        }
+
+        function getColumnsToRemoveCount() {
+            return csvHeaders.filter(h => 
+                columnsToRemoveNormalized.has(normalizeColumnName(h))
+            ).length;
+        }
+
+        function processFile() {
+            if (!csvData || !csvHeaders) {
+                showStatus('Najpierw załaduj plik CSV', 'error');
+                return;
+            }
+
+            // Find indices of columns to keep
+            const indicesToKeep = [];
+            const headersToKeep = [];
+
+            csvHeaders.forEach((header, index) => {
+                if (!columnsToRemoveNormalized.has(normalizeColumnName(header))) {
+                    indicesToKeep.push(index);
+                    headersToKeep.push(header);
+                }
+            });
+
+            if (headersToKeep.length === 0) {
+                showStatus('Wszystkie kolumny zostałyby usunięte! Anulowano.', 'error');
+                return;
+            }
+
+            // Filter data
+            const filteredData = csvData.map(row => 
+                indicesToKeep.map(i => row[i] || '')
+            );
+
+            // Show preview
+            showPreview(headersToKeep, filteredData.slice(0, 5));
+
+            // Generate CSV
+            const csvContent = generateCSV(headersToKeep, filteredData);
+
+            // Download
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            
+            // Generate filename
+            const baseName = originalFileName.replace(/\.csv$/i, '');
+            const newFileName = `${baseName}_filtered.csv`;
+            
+            link.href = url;
+            link.download = newFileName;
+            link.click();
+
+            URL.revokeObjectURL(url);
+
+            const removedCount = csvHeaders.length - headersToKeep.length;
+            showStatus(
+                `Usunięto ${removedCount} kolumn. Pozostało ${headersToKeep.length} kolumn. ` +
+                `Plik "${newFileName}" został pobrany.`, 
+                'success'
+            );
+        }
+
+        function generateCSV(headers, data) {
+            const escapeField = (field) => {
+                if (field === null || field === undefined) return '';
+                const str = String(field);
+                if (str.includes(';') || str.includes('"') || str.includes('\n')) {
+                    return '"' + str.replace(/"/g, '""') + '"';
+                }
+                return str;
+            };
+
+            const lines = [
+                headers.map(escapeField).join(';'),
+                ...data.map(row => row.map(escapeField).join(';'))
+            ];
+
+            return lines.join('\n');
+        }
+
+        function showPreview(headers, data) {
+            const table = document.getElementById('previewTable');
+            table.innerHTML = '';
+
+            // Header row
+            const headerRow = document.createElement('tr');
+            headers.forEach(h => {
+                const th = document.createElement('th');
+                th.textContent = h;
+                headerRow.appendChild(th);
+            });
+            table.appendChild(headerRow);
+
+            // Data rows
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                row.forEach(cell => {
+                    const td = document.createElement('td');
+                    td.textContent = cell || '';
+                    tr.appendChild(td);
+                });
+                table.appendChild(tr);
+            });
+
+            document.getElementById('previewSection').classList.add('visible');
+        }
+
+        function clearFile() {
+            csvData = null;
+            csvHeaders = null;
+            originalFileName = '';
+
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileInfo').classList.remove('visible');
+            document.getElementById('detectedColumns').classList.remove('visible');
+            document.getElementById('previewSection').classList.remove('visible');
+            document.getElementById('status').classList.remove('visible');
+            
+            document.getElementById('btnClear').disabled = true;
+            document.getElementById('btnProcess').disabled = true;
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status visible ' + type;
+        }
+    </script>
+</body>
+</html>
