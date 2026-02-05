@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         BLPaczka - Poczta Polska (E-nadawca) v1.8
+// @name         BLPaczka - Poczta Polska (E-nadawca) v1.9
 // @namespace    http://tampermonkey.net/
-// @version      1.8
-// @description  Full Auto: Dane (Firma+Nazwisko+Email) -> Logowanie -> Szukaj -> Wynik -> Zamów Kuriera -> Wypełnij Formularz.
+// @version      1.9
+// @description  Full Auto: Dane (Firma+Nazwisko+Email) -> Logowanie -> Szukaj -> Wynik -> Zamów Kuriera -> Wypełnij Formularz + PNA.
 // @author       Gemini & User
 // @match        *://*.blpaczka.com/admin/courier/orders/view/*
 // @match        https://e-nadawca.poczta-polska.pl/*
@@ -296,6 +296,17 @@
                 // Wypełniamy Email (jeśli istnieje pole i mamy dane)
                 if (formEmail && data.email) {
                     simulateInput(formEmail, data.email);
+                }
+
+                // Wypełniamy PNA miejsca odbioru (kod pocztowy) i miejscowość
+                const formPostalCode = document.getElementById('kod_pocztowy');
+                const formCity = document.getElementById('miejscowosc');
+
+                if (formPostalCode && data.postal) {
+                    simulateInput(formPostalCode, data.postal);
+                }
+                if (formCity && data.city) {
+                    simulateInput(formCity, data.city);
                 }
 
                 return;
