@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         BLPaczka - All In One v2.0 (Zoptymalizowany)
 // @namespace    http://tampermonkey.net/
-// @version      2.4.2
-// @description  Kompletny zestaw narzędzi: Tryb ciemny, Szybkie wyszukiwanie, Ochrona przed blokadą, Licznik czasu, Kopiowanie danych, Narzędzia API, Ulepszona lista, Podgląd XLSX, Panel ustawień.
+// @version      2.5.0
+// @description  Kompletny zestaw narzędzi: Tryb ciemny, Szybkie wyszukiwanie (przesyłki, klienci, faktury), Ochrona przed blokadą, Licznik czasu, Kopiowanie danych, Narzędzia API, Ulepszona lista, Podgląd XLSX, Panel ustawień.
 // @author       Gemini & User & Claude
 // @match        *://*.blpaczka.com/*
 // @match        https://api.blpaczka.com/*
@@ -46,7 +46,7 @@
         },
 
         // Wersja dla cache-busting
-        version: '2.4.2'
+        version: '2.5.0'
     };
 
     // ================= STORAGE HELPER =================
@@ -571,18 +571,18 @@
             right: 20px;
             z-index: 9999;
             background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-            padding: 15px;
-            border-radius: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             border: 1px solid #e0e0e0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            min-width: 320px;
+            min-width: 250px;
             transition: all 0.3s ease;
         }
 
         #blp-search-panel.collapsed {
             min-width: auto;
-            padding: 10px 15px;
+            padding: 8px 12px;
         }
 
         #blp-search-panel.collapsed .blp-search-content {
@@ -593,8 +593,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            padding-bottom: 10px;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
             border-bottom: 1px solid #eee;
         }
 
@@ -605,7 +605,7 @@
         }
 
         .blp-search-header span {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: #666;
             text-transform: uppercase;
@@ -632,8 +632,8 @@
         .blp-search-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 8px;
+            margin-bottom: 6px;
         }
 
         .blp-search-row:last-child {
@@ -641,21 +641,18 @@
         }
 
         .blp-search-label {
-            font-size: 13px;
-            color: #555;
-            font-weight: 600;
-            min-width: 90px;
+            font-size: 14px;
+            min-width: auto;
             display: flex;
             align-items: center;
-            gap: 6px;
         }
 
         .blp-search-input {
             flex: 1;
-            padding: 10px 12px;
+            padding: 7px 10px;
             border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 13px;
             outline: none;
             transition: all 0.2s ease;
             background: #fff;
@@ -683,18 +680,19 @@
         }
 
         .blp-search-hint {
-            font-size: 11px;
+            font-size: 10px;
             color: #888;
-            margin-top: 8px;
-            padding-left: 100px;
-            line-height: 1.4;
+            margin-top: 4px;
+            padding-left: 24px;
+            line-height: 1.3;
         }
 
         .blp-search-btn {
-            padding: 10px 16px !important;
-            border-radius: 8px !important;
+            padding: 7px 10px !important;
+            border-radius: 6px !important;
             font-size: 13px !important;
-            min-width: 70px;
+            min-width: auto;
+            line-height: 1 !important;
         }
 
         /* Licznik czasu */
@@ -872,7 +870,7 @@
         @media (max-width: 1200px) {
             #blp-search-panel {
                 right: 10px;
-                min-width: 280px;
+                min-width: 250px;
             }
         }
 
@@ -1462,19 +1460,22 @@
                 </div>
                 <div class="blp-search-content">
                     <div class="blp-search-row">
-                        <span class="blp-search-label">📦 Przesyłka:</span>
+                        <span class="blp-search-label">📦</span>
                         <input type="text" id="blp-waybill-input" class="blp-search-input"
                                placeholder="Nr listu przewozowego" maxlength="50" autocomplete="off">
-                        <button id="blp-waybill-btn" class="blp-btn blp-btn-primary blp-search-btn">Szukaj</button>
+                        <button id="blp-waybill-btn" class="blp-btn blp-btn-primary blp-search-btn" title="Szukaj przesyłki">🔍</button>
                     </div>
                     <div class="blp-search-row">
-                        <span class="blp-search-label">👤 Klient:</span>
+                        <span class="blp-search-label">👤</span>
                         <input type="text" id="blp-client-input" class="blp-search-input"
                                placeholder="ID / NIP / Tel / Email" maxlength="100" autocomplete="off">
-                        <button id="blp-client-btn" class="blp-btn blp-btn-success blp-search-btn">Szukaj</button>
+                        <button id="blp-client-btn" class="blp-btn blp-btn-success blp-search-btn" title="Szukaj klienta">🔍</button>
                     </div>
-                    <div class="blp-search-hint">
-                        💡 <strong>ID</strong> (max 5 cyfr) | <strong>NIP/Tel</strong> (więcej cyfr) | <strong>Email/Tekst</strong> (wyszukiwanie ogólne)
+                    <div class="blp-search-row">
+                        <span class="blp-search-label">🧾</span>
+                        <input type="text" id="blp-invoice-input" class="blp-search-input"
+                               placeholder="Nr faktury, np. FS/2722/02/2026" maxlength="100" autocomplete="off">
+                        <button id="blp-invoice-btn" class="blp-btn blp-btn-info blp-search-btn" title="Szukaj faktury">🔍</button>
                     </div>
                 </div>
             `;
@@ -1517,6 +1518,19 @@
                 });
             }
 
+            // Wyszukiwanie faktury
+            const invoiceInput = Utils.$('#blp-invoice-input');
+            const invoiceBtn = Utils.$('#blp-invoice-btn');
+
+            if (invoiceBtn) {
+                invoiceBtn.addEventListener('click', () => this.searchInvoice());
+            }
+            if (invoiceInput) {
+                invoiceInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.searchInvoice();
+                });
+            }
+
             // Skróty klawiaturowe
             if (Storage.getConfig('enableKeyboardShortcuts')) {
                 document.addEventListener('keydown', (e) => {
@@ -1531,6 +1545,12 @@
                         e.preventDefault();
                         clientInput?.focus();
                         clientInput?.select();
+                    }
+                    // Ctrl+Shift+I - faktura
+                    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                        e.preventDefault();
+                        invoiceInput?.focus();
+                        invoiceInput?.select();
                     }
                     // Escape - zamknij panel
                     if (e.key === 'Escape') {
@@ -1602,6 +1622,24 @@
             }
 
             window.location.href = searchUrl;
+        },
+
+        searchInvoice() {
+            const input = Utils.$('#blp-invoice-input');
+            if (!input) return;
+
+            const value = input.value.trim();
+            if (!value) {
+                this.showInputError(input);
+                return;
+            }
+
+            Storage.set('lastInvoice', value);
+
+            // Zamień "/" na "_slash_" w numerze faktury
+            const encodedNumber = value.replace(/\//g, '_slash_');
+
+            window.location.href = `https://api.blpaczka.com/admin/courier/invoices/index/number:${encodedNumber}/limit:20`;
         },
 
         showInputError(input) {
@@ -2432,7 +2470,7 @@
                     textAlign: 'center'
                 },
                 innerHTML: `BLPaczka All-In-One v${CONFIG.version}<br>
-                           <strong>Skróty:</strong> Ctrl+Shift+F (przesyłka) | Ctrl+Shift+K (klient)`
+                           <strong>Skróty:</strong> Ctrl+Shift+F (przesyłka) | Ctrl+Shift+K (klient) | Ctrl+Shift+I (faktura)`
             });
             content.appendChild(versionInfo);
 
@@ -2611,7 +2649,7 @@
         }
 
         console.log(`%c🚀 BLPaczka All-In-One v${CONFIG.version} załadowany!`, 'color: #28a745; font-weight: bold; font-size: 14px;');
-        console.log('%c   Skróty: Ctrl+Shift+F (przesyłka) | Ctrl+Shift+K (klient)', 'color: #666; font-size: 11px;');
+        console.log('%c   Skróty: Ctrl+Shift+F (przesyłka) | Ctrl+Shift+K (klient) | Ctrl+Shift+I (faktura)', 'color: #666; font-size: 11px;');
     }
 
     bootstrap();
