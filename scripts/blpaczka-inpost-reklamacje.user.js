@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         BLPaczka - InPost Auto Reklamacje
+// @name         BLPaczka - InPost Auto Reklamacje (Fix FedEx Conflict)
 // @namespace    http://tampermonkey.net/
 // @version      3.0
 // @description  Wypełnia formularz reklamacyjny InPost. Ignoruje przesyłki FedEx.
