@@ -395,7 +395,7 @@
                 <div class="script-header">
                     <div class="script-info">
                         <h2>🔴 DPD Auto Pickup</h2>
-                        <span class="script-version">v1.7</span>
+                        <span class="script-version">v1.9</span>
                     </div>
                     <a href="scripts/blpaczka-dpd-auto-pickup.user.js" class="install-btn dpd">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -408,12 +408,13 @@
                 </div>
                 <p class="script-description">
                     Automatyzuje zamawianie kuriera DPD. Wykrywa przesyłki DPD i automatycznie wypełnia formularz zamówienia kuriera.
-                    Zawiera fix dla numeru telefonu.
+                    Zawiera fix telefonu, auto-wypełnianie wagi i wymiarów przesyłki.
                 </p>
                 <div class="features-list">
                     <span class="feature-tag dpd">DPD</span>
                     <span class="feature-tag">Auto-wypełnianie</span>
                     <span class="feature-tag">Fix telefonu</span>
+                    <span class="feature-tag">Waga i wymiary</span>
                 </div>
             </div>
 
@@ -422,7 +423,7 @@
                 <div class="script-header">
                     <div class="script-info">
                         <h2>🟤 UPS Auto Pickup</h2>
-                        <span class="script-version">v1.2</span>
+                        <span class="script-version">v2.2</span>
                     </div>
                     <a href="scripts/blpaczka-ups-auto-pickup.user.js" class="install-btn ups">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -434,13 +435,15 @@
                     </a>
                 </div>
                 <p class="script-description">
-                    Automatyzuje zamawianie kuriera UPS. Wykrywa UPS po numerze listu (1Z...) lub nazwie konta/cennika. 
-                    Automatycznie usuwa polskie znaki i wypełnia formularz.
+                    Automatyzuje zamawianie kuriera UPS (nowy formularz Angular). Wykrywa UPS po numerze listu (1Z...) lub nazwie konta. 
+                    Obsługuje niestandardowy adres odbioru (NST), email nadawcy i wagę przesyłki. Usuwa polskie znaki.
                 </p>
                 <div class="features-list">
                     <span class="feature-tag ups">UPS</span>
                     <span class="feature-tag">Auto-wypełnianie</span>
                     <span class="feature-tag">Usuwanie PL znaków</span>
+                    <span class="feature-tag">Niestandardowy adres</span>
+                    <span class="feature-tag">Waga przesyłki</span>
                 </div>
             </div>
 
@@ -584,6 +587,37 @@
                     <span class="feature-tag">Reklamacje</span>
                     <span class="feature-tag">Auto-wypełnianie</span>
                     <span class="feature-tag">Wybór rodzaju</span>
+                </div>
+            </div>
+
+            <!-- Poczta Polska Reklamacje -->
+
+            <!-- DPD Reklamacje -->
+            <div class="script-card">
+                <div class="script-header">
+                    <div class="script-info">
+                        <h2>⚠️ DPD Auto Reklamacje</h2>
+                        <span class="script-version">v1.1</span>
+                    </div>
+                    <a href="scripts/blpaczka-dpd-reklamacje.user.js" class="install-btn dpd">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Zainstaluj
+                    </a>
+                </div>
+                <p class="script-description">
+                    Automatycznie wypełnia formularz reklamacyjny DPD (zgloszenia.dpd.com.pl). 
+                    Wybór powodu reklamacji na panelu BLPaczka, auto-wypełnianie danych firmy, nr konta i adresu.
+                </p>
+                <div class="features-list">
+                    <span class="feature-tag dpd">DPD</span>
+                    <span class="feature-tag">Reklamacje</span>
+                    <span class="feature-tag">Auto-wypełnianie</span>
+                    <span class="feature-tag">Wybór powodu</span>
+                    <span class="feature-tag">8 typów zgłoszeń</span>
                 </div>
             </div>
 
@@ -781,7 +815,7 @@
         </div>
 
         <footer>
-            <p>BLPaczka Scripts • Ostatnia aktualizacja: Luty 2026</p>
+            <p>BLPaczka Scripts • Ostatnia aktualizacja: Marzec 2026</p>
         </footer>
     </div>
 </body>
