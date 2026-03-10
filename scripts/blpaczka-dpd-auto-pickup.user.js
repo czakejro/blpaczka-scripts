@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         BLPaczka - DPD Auto Pickup (v1.7 - DPD Detection)
 // @namespace    http://tampermonkey.net/
-// @version      1.7
-// @description  Automatyzuje zamawianie DPD (Tylko dla zamówień DPD + Fix telefonu).
+// @version      1.9
+// @description  Automatyzuje zamawianie DPD (Tylko dla zamówień DPD + Fix telefonu + Wymiary i waga przesyłki). v1.9: Fix opóźnienia renderowania pól wymiarów.
 // @author       Gemini & User
 // @match        *://*.blpaczka.com/admin/courier/orders/view/*
 // @match        https://zk.dpd.com.pl/*
@@ -40,20 +40,16 @@
     function initBLPaczka() {
         // --- DETEKCJA CZY TO ZAMÓWIENIE DPD ---
         let isDpdOrder = false;
-        // Szukamy wszystkich komórek tabeli
         const tds = Array.from(document.querySelectorAll('td'));
-        // Znajdujemy komórkę z napisem "Cena przesyłki"
         const priceLabel = tds.find(td => td.textContent.trim().includes('Cena przesyłki'));
 
         if (priceLabel && priceLabel.nextElementSibling) {
-            // Sprawdzamy zawartość komórki obok (np. "DPD point to door")
             const serviceName = priceLabel.nextElementSibling.textContent.toUpperCase();
             if (serviceName.includes('DPD')) {
                 isDpdOrder = true;
             }
         }
 
-        // Jeśli to nie jest DPD, kończymy działanie (nie dodajemy przycisku)
         if (!isDpdOrder) return;
 
         // --- KONIEC DETEKCJI ---
@@ -140,11 +136,17 @@
         const packageInfo = {};
         if (packageMatch) {
             packageInfo.weight = packageMatch[1].replace(',', '.');
+            packageInfo.length = packageMatch[2];
+            packageInfo.width = packageMatch[3];
+            packageInfo.height = packageMatch[4];
             packageInfo.dims = `${packageMatch[2]}/${packageMatch[3]}/${packageMatch[4]}`;
         } else {
             const weightMatch = htmlContent.match(/(\d+(?:[.,]\d+)?)\s*kg/i);
             if(weightMatch) packageInfo.weight = weightMatch[1].replace(',', '.');
             packageInfo.dims = '';
+            packageInfo.length = '';
+            packageInfo.width = '';
+            packageInfo.height = '';
         }
         return packageInfo;
     }
@@ -205,7 +207,10 @@
             phone: cleanPhoneNumber(source.phone),
             email: source.email || '',
             weight: packageInfo.weight || '',
-            dims: packageInfo.dims || ''
+            dims: packageInfo.dims || '',
+            length: packageInfo.length || '',
+            width: packageInfo.width || '',
+            height: packageInfo.height || ''
         };
 
         if (!dpdData.company && dpdData.nameSurname) dpdData.company = dpdData.nameSurname;
@@ -221,9 +226,9 @@
         const dataStr = GM_getValue('dpd_autofill_data');
         if (!dataStr) return;
         const data = JSON.parse(dataStr);
-        console.log("DPD Script: Dane załadowane", data);
+        console.log("DPD Script v1.8: Dane załadowane", data);
 
-        const waitFor = (attributeSelector) => new Promise(resolve => {
+        const waitFor = (attributeSelector, timeout = 10000) => new Promise((resolve, reject) => {
             if (document.querySelector(attributeSelector)) return resolve(document.querySelector(attributeSelector));
             const obs = new MutationObserver(() => {
                 if (document.querySelector(attributeSelector)) {
@@ -232,6 +237,7 @@
                 }
             });
             obs.observe(document.body, { childList: true, subtree: true });
+            setTimeout(() => { obs.disconnect(); reject(new Error(`Timeout: ${attributeSelector}`)); }, timeout);
         });
 
         const simulateInput = (selector, value) => {
@@ -286,14 +292,12 @@
             if (formReady) {
                 console.log("DPD: Zaczynam wypełnianie...");
 
-                // 1. DANE NADAWCY (Wypełniamy raz)
+                // 1. DANE NADAWCY
                 simulateInput('[name="forwardingAddress.companyName"]', data.company);
                 simulateInput('[name="forwardingAddress.nameSurname"]', data.nameSurname);
                 simulateInput('[name="forwardingAddress.address"]', data.address);
                 simulateInput('[name="forwardingAddress.zipCode"]', data.postal);
                 simulateInput('[name="forwardingAddress.city"]', data.city);
-
-                // Telefon wypełniamy standardowo
                 simulateInput('[name="forwardingAddress.phone"]', data.phone);
 
                 // --- PĘTLA POPRAWIAJĄCA (Fix znikającego telefonu) ---
@@ -309,7 +313,6 @@
                     }
                     if (checkCount > 8) clearInterval(fixInterval);
                 }, 500);
-
 
                 // 2. PŁATNIK (Osoba kontaktowa)
                 setTimeout(() => {
@@ -333,9 +336,63 @@
                     simulateInput('[name="orderer.email"]', FIXED_ORDERER_EMAIL);
                 }, 2500);
 
+                // 5. LICZBA PACZEK + WAGA + WYMIARY
+                setTimeout(async () => {
+                    console.log("DPD v1.8: Uzupełniam dane przesyłki (liczba, waga, wymiary)...");
+
+                    // Wpisz liczbę paczek = 1
+                    simulateInput('#origin-declaration-parcels-count', '1');
+
+                    // Poczekaj aż pojawią się pola wymiarów (po wpisaniu liczby paczek)
+                    try {
+                        await waitFor('#origin-declaration-parcels-total-weight', 5000);
+                        await new Promise(r => setTimeout(r, 300));
+
+                        // Waga całkowita
+                        if (data.weight) {
+                            simulateInput('#origin-declaration-parcels-total-weight', data.weight);
+                        }
+
+                        // Waga najcięższej paczki (taka sama — mamy 1 paczkę)
+                        if (data.weight) {
+                            // Zaokrąglij do int dla tego pola (maxlength=4)
+                            const weightInt = Math.ceil(parseFloat(data.weight)).toString();
+                            simulateInput('#origin-declaration-heaviest-parcel-weight', weightInt);
+                        }
+
+                        // Pauza — DPD renderuje pola wymiarów po wpisaniu wagi
+                        console.log("DPD v1.8: Czekam 2s na pola wymiarów...");
+                        await new Promise(r => setTimeout(r, 2000));
+
+                        // Czekaj aż pole wymiarów faktycznie będzie w DOM
+                        try {
+                            await waitFor('#origin-declaration-greatest-parcel-height', 5000);
+                        } catch (e) {
+                            console.warn("DPD v1.8: Pola wymiarów nie pojawiły się, próbuję mimo to...");
+                        }
+
+                        // Wymiary
+                        if (data.height) simulateInput('#origin-declaration-greatest-parcel-height', data.height);
+                        if (data.length) simulateInput('#origin-declaration-greatest-parcel-length', data.length);
+                        if (data.width) simulateInput('#origin-declaration-greatest-parcel-width', data.width);
+
+                        console.log("DPD v1.8: Wymiary wypełnione!", {
+                            weight: data.weight,
+                            length: data.length,
+                            width: data.width,
+                            height: data.height
+                        });
+
+                    } catch (e) {
+                        console.warn("DPD v1.8: Pola wymiarów nie pojawiły się w czasie:", e);
+                    }
+                }, 3000);
+
                 // Informacja
+                const dimsInfo = data.dims ? ` | 📐 ${data.dims} cm` : '';
+                const weightInfo = data.weight ? ` | ⚖️ ${data.weight} kg` : '';
                 const info = document.createElement('div');
-                info.innerHTML = `✅ DPD Auto-Fill:<br><b>Firma:</b> ${data.company}<br><b>Tel:</b> ${data.phone}<br>Proszę sprawdzić poprawność!`;
+                info.innerHTML = `✅ DPD Auto-Fill v1.8:<br><b>Firma:</b> ${data.company}<br><b>Tel:</b> ${data.phone}${weightInfo}${dimsInfo}<br>Proszę sprawdzić poprawność!`;
                 info.style.cssText = 'position:fixed; top:10px; right:10px; background:#DC0032; color:#fff; padding:15px; border-radius:5px; z-index:9999; font-weight:bold; font-family:sans-serif; border: 2px solid #000; text-align:left; font-size:12px;';
                 document.body.appendChild(info);
 
